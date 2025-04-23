@@ -1,0 +1,304 @@
+import { PrismaClient } from "@prisma/client";
+import { getAirportById, getAirportByName } from "./airportRepository.js";
+import { getAircraftById, getAircraftByName } from "./aircraftRepository.js";
+import {
+  createFlightSeat,
+  getFlightSeatBySeatClassAndFlight,
+  updateFlightSeat,
+} from "./flightSeatRepository.js";
+const prisma = new PrismaClient();
+
+export const getAllFlights = async () => {
+  return await prisma.flight.findMany();
+};
+
+export const getFlightById = async (id) => {
+  return await prisma.flight.findUnique({
+    where: { id },
+  });
+};
+
+export const getFlightByFlightNumber = async (flightNumber) => {
+  return await prisma.flight.findUnique({
+    where: { flightNumber },
+  });
+};
+
+export const searchFlightsByName = async (q) => {
+  return await prisma.flight.findMany({
+    where: {
+      OR: [{ flightNumber: { contains: q, mode: "insensitive" } }],
+    },
+    take: 10,
+    orderBy: {
+      flightNumber: "asc",
+    },
+  });
+};
+
+export const createFlight = async (data) => {
+  if (data.departureAirport === data.arrivalAirport) {
+    throw new Error("Depature airport and arrival airport must be different");
+  }
+  const departureAirport = await getAirportByName(data.departureAirport);
+  const arrivalAirport = await getAirportByName(data.arrivalAirport);
+  const aircraft = await getAircraftByName(data.aircraft);
+  const flight = await prisma.flight.findUnique({
+    where: { flightNumber: data.flightNumber },
+  });
+  if (flight) {
+    throw new Error("Flight is existing");
+  }
+  if (!departureAirport || !arrivalAirport) {
+    throw new Error("Invalid airport");
+  }
+  if (!aircraft) {
+    throw new Error("Invalid aircraft");
+  }
+  const { seats } = data;
+
+  const tempCreatedFlight = await prisma.flight.create({
+    data: {
+      flightNumber: data.flightNumber,
+      departureTime: data.departureTime,
+      arrivalTime: data.arrivalTime,
+      aircraft: { connect: { id: aircraft.id } },
+      departureAirport: { connect: { id: departureAirport.id } },
+      arrivalAirport: { connect: { id: arrivalAirport.id } },
+    },
+  });
+
+  const createdSeats = await seats.map(async (seat) => {
+    const seatData = {
+      ...seat,
+      flightId: tempCreatedFlight.id,
+    };
+    await createFlightSeat(seatData);
+  });
+
+  const createdFlight = {
+    ...tempCreatedFlight,
+    seats: createdSeats,
+  };
+
+  return createdFlight;
+};
+
+export const updatedFlight = async (id, data) => {
+  const { estimatedDeparture, estimatedArrival, seats } = data;
+  const flight = await prisma.flight.findUnique({
+    where: {
+      id,
+      status: {
+        in: ["DELAYED", "SCHEDULED"],
+      },
+    },
+  });
+  if (!flight) {
+    throw new Error("Flight not found or has taken off");
+  }
+
+  if (
+    estimatedDeparture < flight.departureTime &&
+    (flight.estimatedDeparture === null ||
+      estimatedDeparture < flight.estimatedDeparture)
+  ) {
+    throw new Error(
+      "The flight's schedule prevents an early departure, which may inconvenience the customer."
+    );
+  }
+  await seats.map(async (seat) => {
+    const oldSeat = await getFlightSeatBySeatClassAndFlight(id, seat.seatClass);
+    if (seat.totalSeats < oldSeat.bookedSeats) {
+      throw new Error("Total seats 's not less than booked seats");
+    }
+    const dataSeat = {
+      totalSeats: seat.totalSeats,
+      price: seat.price,
+    };
+    await updateFlightSeat(oldSeat.id, dataSeat);
+  });
+  const flightData = {
+    estimatedDeparture,
+    estimatedArrival,
+  };
+
+  return await prisma.flight.update({
+    where: { id },
+    data: {
+      ...flightData,
+    },
+  });
+};
+
+export const getFlightsBySearch = async (
+  page = 1,
+  pageSize = 10,
+  query = "",
+  sortBy = "departureTime",
+  sortOrder = "asc"
+) => {
+  const searchCondition = query
+    ? {
+        OR: [
+          { flightNumber: { contains: query, mode: "insensitive" } },
+          {
+            departureAirport: {
+              is: {
+                OR: [
+                  { name: { contains: query, mode: "insensitive" } },
+                  { iataCode: { contains: query, mode: "insensitive" } },
+                  { icaoCode: { contains: query, mode: "insensitive" } },
+                ],
+              },
+            },
+          },
+          {
+            arrivalAirport: {
+              is: {
+                OR: [
+                  { name: { contains: query, mode: "insensitive" } },
+                  { iataCode: { contains: query, mode: "insensitive" } },
+                  { icaoCode: { contains: query, mode: "insensitive" } },
+                ],
+              },
+            },
+          },
+          {
+            aircraft: {
+              is: {
+                OR: [
+                  { name: { contains: query, mode: "insensitive" } },
+                  { manufacturer: { contains: query, mode: "insensitive" } },
+                ],
+              },
+            },
+          },
+        ],
+      }
+    : {};
+
+  const skip = (page - 1) * pageSize;
+
+  let orderByOption;
+
+  if (
+    sortBy === "departureAirport" ||
+    sortBy === "arrivalAirport" ||
+    sortBy === "aircraft"
+  ) {
+    orderByOption = {
+      [sortBy]: {
+        name: sortOrder.toLowerCase() === "desc" ? "desc" : "asc",
+      },
+    };
+  } else {
+    orderByOption = {
+      [sortBy]: sortOrder.toLowerCase() === "desc" ? "desc" : "asc",
+    };
+  }
+
+  const flights = await prisma.flight.findMany({
+    where: searchCondition,
+    skip,
+    take: pageSize,
+    orderBy: orderByOption,
+    include: {
+      departureAirport: {
+        select: {
+          id: true,
+          name: true,
+          iataCode: true,
+          icaoCode: true,
+        },
+      },
+      arrivalAirport: {
+        select: {
+          id: true,
+          name: true,
+          iataCode: true,
+          icaoCode: true,
+        },
+      },
+      aircraft: {
+        select: {
+          id: true,
+          name: true,
+          manufacturer: true,
+        },
+      },
+      seats: {
+        select: {
+          price: true,
+          seatClass: true,
+          totalSeats: true,
+          bookedSeats: true,
+        },
+      },
+    },
+  });
+
+  const sanitize = (obj) => {
+    const converted = { ...obj };
+    for (const key in converted) {
+      const val = converted[key];
+      if (typeof converted[key] === "bigint") {
+        converted[key] = converted[key].toString();
+      }
+      if (val instanceof Date) {
+        converted[key] = val.toISOString();
+      }
+    }
+    return converted;
+  };
+
+  const flightsWithStats = flights.map((f) => {
+    const seatsByClass = f.seats.map((s) => ({
+      seatClass: s.seatClass,
+      totalSeats: s.totalSeats,
+      bookedSeats: s.bookedSeats,
+      price: s.price,
+    }));
+
+    const totalSeats = seatsByClass.reduce((sum, s) => sum + s.totalSeats, 0);
+    const bookedSeats = seatsByClass.reduce((sum, s) => sum + s.bookedSeats, 0);
+
+    return sanitize({
+      ...f,
+      seats: seatsByClass,
+      totalSeats,
+      bookedSeats,
+    });
+  });
+
+  const totalFlights = await prisma.flight.count({
+    where: searchCondition,
+  });
+
+  return {
+    flights: flightsWithStats,
+    totalPages: Math.ceil(totalFlights / pageSize),
+    currentPage: page,
+  };
+};
+
+export const cancelFlight = async (id) => {
+  const flight = await prisma.flight.findUnique({
+    where: {
+      id: Number(id),
+      status: {
+        in: ["SCHEDULED", "DELAYED"],
+      },
+    },
+  });
+
+  if (!flight) {
+    throw new Error("Flight not found");
+  }
+  return await prisma.flight.update({
+    where: { id: Number(id) },
+    data: {
+      status: "CANCELLED",
+    },
+  });
+};
