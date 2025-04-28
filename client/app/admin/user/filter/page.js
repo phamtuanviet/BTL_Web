@@ -3,24 +3,23 @@ import React, { useEffect, useState } from "react";
 import HearderAdmin from "@/app/_components/HearderAdmin";
 import Sidebar from "@/app/_components/Sidebar";
 import { Eye, Pen, SlidersHorizontal, X } from "lucide-react";
+import Swal from "sweetalert2";
 import Pagination from "@/app/_components/Pagination";
 import Table from "@/app/_components/Table";
 import {
-  columnFlights,
-  updateFlightsFormFields,
-  filterFlightFormFields,
+  columnUsers,
+  updateUsersFormFields,
+  filterUsersFormFields,
 } from "@/data/hardData.js";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import aircraftService from "@/lib/api/aircraft";
+import UpdateModal from "@/app/_components/UpdateModal";
 import FilterModal from "@/app/_components/FilterModal";
-import flightService from "@/lib/api/flight";
-import airportService from "@/lib/api/airport";
-import UpdateFlight from "@/app/_components/UpdateFlight";
+import userService from "@/lib/api/user";
 
 const page = () => {
   const searchParams = useSearchParams();
-  const [flights, setFlights] = useState([]);
+  const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [editingItem, setEditingItem] = useState(null);
@@ -38,36 +37,18 @@ const page = () => {
     setCurrentPage(page);
   };
 
-  const searchListAirports = async (q, { signal } = {}) => {
-    return await airportService.searchAirportsInFlight(q, { signal });
-  };
-
-  const searchListAircrafts = async (q, { signal } = {}) => {
-    return await aircraftService.searchAircraftsInFlight(q, { signal });
-  };
-
   const renderRow = (item) => (
     <tr
       key={item.id}
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-slate-200"
     >
       <td className="font-sans">{item.id}</td>
-      <td className="font-sans">{item.flightNumber}</td>
-      <td className="font-sans">{item.departureAirport.name}</td>
-      <td className="font-sans">{item.arrivalAirport.name}</td>
-      <td className="font-sans">
-        {item.estimatedDeparture
-          ? new Date(item.estimatedDeparture).toLocaleString()
-          : new Date(item.departureTime).toLocaleString()}
+      <td className="hidden md:table-cell font-sans py-4">{item.name}</td>
+      <td className="hidden lg:table-cell font-sans">{item.email}</td>
+      <td className="hidden lg:table-cell font-sans">
+        {item.isAccountVerified ? "Yes" : "No"}
       </td>
-      <td className="font-sans">
-        {item.estimatedArrival
-          ? new Date(item.estimatedArrival).toLocaleString()
-          : new Date(item.arrivalTime).toLocaleString()}
-      </td>
-      <td className="hidden lg:table-cell font-sans">{item.status}</td>
-      <td className="hidden lg:table-cell font-sans">{item.totalSeats}</td>
-      <td className="hidden lg:table-cell font-sans">{item.bookedSeats}</td>
+      <td className="font-sans">{item.role}</td>
       <td>
         <div className="flex items-center gap-1">
           <Link href={`/admin/user/${item.id}`}>
@@ -92,12 +73,12 @@ const page = () => {
         page: currentPage,
         pageSize: 10,
       };
-      const res = await flightService.filterFlights(filterData);
-      setFlights(res?.data.flights);
+      const res = await userService.filterUsers(filterData);
+      setUsers(res?.data.users);
       setTotalPages(res?.data.totalPages);
     } catch (error) {
-      console.error("Error fetch flight:", error);
-      setFlights([]);
+      console.error("Error fetch users:", error);
+      setUsers([]);
     }
   };
 
@@ -109,7 +90,7 @@ const page = () => {
       }
       return params;
     });
-    setCurrentPage(1)
+    setCurrentPage(1);
   }, [searchParams]);
 
   useEffect(() => {
@@ -133,14 +114,16 @@ const page = () => {
   };
 
   const submitUpdate = async (updatedValues) => {
-    await flightService.updateFlight(updatedValues.id, updatedValues);
+    const { id, role, isAccountVerified } = updatedValues;
+    const updatedData = { role, isAccountVerified };
+    await userService.updateUser(id, updatedData);
     fetchData();
     closeModal();
   };
 
   useEffect(() => {
     fetchData();
-  }, [currentPage,allParams]);
+  }, [currentPage, allParams]);
 
   return (
     <div className="h-screen w-full flex">
@@ -150,7 +133,7 @@ const page = () => {
         <div className="p-5 flex flex-col items-center justify-between">
           <div className="w-full md:w-[80%] flex flex-col  justify-between font-medium gap-2">
             <div className="flex flex-row items-center  justify-start gap-2">
-              <p>Filter Flights</p>
+              <p>Filter Users</p>
               <button
                 className="flex flex-row items-center justify-center rounded-full bg-yellow-200 p-2 cursor-pointer"
                 onClick={handleFilter}
@@ -169,30 +152,24 @@ const page = () => {
               ))}
             </div>
           </div>
-          <Table columns={columnFlights} renderRow={renderRow} data={flights} />
+          <Table columns={columnUsers} renderRow={renderRow} data={users} />
 
           {editingItem && (
-            <UpdateFlight
-              key="update-flight"
+            <UpdateModal
+              key="update-modal"
               item={editingItem}
               onClose={closeModal}
               onSubmit={submitUpdate}
-              updateFormFields={updateFlightsFormFields}
-              type="Flight"
-              searchAirportsByQuery={searchListAirports}
-              searchAircraftsByQuery={searchListAircrafts}
+              updateFormFields={updateUsersFormFields}
+              type="Users"
             />
           )}
           {isFilter && (
             <FilterModal
               key="filter-modal"
               onClose={closeFilterModal}
-              fields={filterFlightFormFields}
-              type="flight"
-              option={{
-                searchAirportsByQuery: searchListAirports,
-                searchAircraftsByQuery: searchListAircrafts,
-              }}
+              fields={filterUsersFormFields}
+              type="user"
             />
           )}
           <Pagination

@@ -24,9 +24,21 @@ export const getTicketById = async (req, res) => {
 
 export const createTicket = async (req, res) => {
   try {
-    const { passengerName, passengerType, seatClass, flightNumber, passengerEmail } = req.body;
+    const {
+      passengerName,
+      passengerType,
+      seatClass,
+      flightNumber,
+      passengerEmail,
+    } = req.body;
 
-    if (!passengerName || !seatClass || !flightNumber || !passengerType || !passengerEmail) {
+    if (
+      !passengerName ||
+      !seatClass ||
+      !flightNumber ||
+      !passengerType ||
+      !passengerEmail
+    ) {
       return res
         .status(400)
         .json({ success: false, message: "Missing required field" });
@@ -84,5 +96,18 @@ export const deleteTicket = async (req, res) => {
     res.status(200).json({ success: true, data: deleteTicket });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const filterTickets = async (req, res) => {
+  try {
+    const data = await ticketRepository.filterTickets(req.query);
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    if (err.message.includes("At least one")) {
+      return res.status(400).json({ success: false, error: err.message });
+    }
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

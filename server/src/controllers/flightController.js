@@ -138,3 +138,14 @@ export const cancelFlight = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const filterFlights = async (req, res) => {
+  try {
+    const data = await flightRepository.filterFlights(req.query);
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    if (err.message.includes('At least one')) return res.status(400).json({ success: false, error: err.message });
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};

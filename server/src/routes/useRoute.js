@@ -1,13 +1,19 @@
-import express from "express"
+import express from "express";
 import userAuth from "../middleware/userAuth.js";
-import { getUserData, getUsersBySearch, updateUser } from "../controllers/userController.js";
-import { getAllUsers } from "../repositories/userRepository.js";
+import {
+  getUserData,
+  getUsersBySearch,
+  updateUser,
+  filterUsers,
+  getAllUsersData,
+} from "../controllers/userController.js";
 
 const userRouter = express.Router();
 
-userRouter.get("/data",userAuth,getUserData)
-userRouter.get("/get-all-user/:start",getAllUsers)
-userRouter.get("/get-users-by-search",getUsersBySearch)
-userRouter.put("/update/:id",updateUser)
+userRouter.get("/data", userAuth, getUserData);
+userRouter.get("/filter", filterUsers);
+userRouter.get("/get-all-user/:start", getAllUsersData);
+userRouter.get("/get-users-by-search", getUsersBySearch);
+userRouter.put("/update/:id", updateUser);
 
 export default userRouter;

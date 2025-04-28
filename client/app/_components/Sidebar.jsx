@@ -1,9 +1,11 @@
-"use client";
+"use client"
+
 import { AlignJustify } from "lucide-react";
 import React, { useState } from "react";
 import Image from "next/image";
 import Menu from "../_components/Menu";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter, usePathname } from 'next/navigation';
 
 const slideVariants = {
   hidden: { opacity: 0, x: -50 },
@@ -11,12 +13,17 @@ const slideVariants = {
 };
 
 const Sidebar = ({ type }) => {
+  const pathname = usePathname();
+  const router = useRouter();
   const [visible, setVisible] = useState(() => {
     if (typeof window !== "undefined") {
       return window.innerWidth < 1024;
     }
     return false;
   });
+  const handleBackClient = () => {
+    router.push("/");
+  }
   return (
     <>
       <AnimatePresence>
@@ -33,7 +40,7 @@ const Sidebar = ({ type }) => {
           >
             <div className="py-5 bg-gray-100 w-[17rem] rounded-r-3xl shadow-md pr-4 h-full">
               <div className="flex justify-between items-center">
-                <div className="flex gap-1 items-center justify-start cursor-pointer font-medium text-sm pl-3">
+                <div className="flex gap-1 items-center justify-start cursor-pointer font-medium text-sm pl-3" onClick={handleBackClient}>
                   <Image
                     alt="logo"
                     width={30}

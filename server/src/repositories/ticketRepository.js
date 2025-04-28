@@ -9,6 +9,20 @@ import { getFlightByFlightNumber, getFlightById } from "./flightRepository.js";
 import { generateBookingReference } from "../services/other.js";
 const prisma = new PrismaClient();
 
+const sanitize = (obj) => {
+  const converted = { ...obj };
+  for (const key in converted) {
+    const val = converted[key];
+    if (typeof converted[key] === "bigint") {
+      converted[key] = converted[key].toString();
+    }
+    if (val instanceof Date) {
+      converted[key] = val.toISOString();
+    }
+  }
+  return converted;
+};
+
 export const getAllTicketsFromFlight = async (flightId) => {
   return await prisma.ticket.findMany({
     where: { flightId },
@@ -106,7 +120,7 @@ export const getTicketsBySearch = async (
             },
           },
           {
-            passengerName: { contains: query, mode: "insensitive" },  
+            passengerName: { contains: query, mode: "insensitive" },
           },
           {
             passengerEmail: { contains: query, mode: "insensitive" },
@@ -181,20 +195,6 @@ export const getTicketsBySearch = async (
     },
   });
 
-  const sanitize = (obj) => {
-    const converted = { ...obj };
-    for (const key in converted) {
-      const val = converted[key];
-      if (typeof converted[key] === "bigint") {
-        converted[key] = converted[key].toString();
-      }
-      if (val instanceof Date) {
-        converted[key] = val.toISOString();
-      }
-    }
-    return converted;
-  };
-
   const ticketsData = tickets.map((t) => {
     return sanitize(t);
   });
@@ -242,4 +242,79 @@ export const deleteTicket = async (id) => {
   return await prisma.ticket.delete({
     where: { id: Number(id) },
   });
+};
+export const filterTickets = async (query) => {
+  const {
+    flightNumber,
+    seatClass,
+    passengerType,
+    passengerName,
+    passengerEmail,
+  } = query;
+
+  const page = parseInt(query.page) || 1;
+  const pageSize = parseInt(query.pageSize) || 10;
+  const skip = (page - 1) * pageSize;
+  const where = {};
+
+  if (flightNumber)
+    where.flight = { is: { flightNumber: { equals: flightNumber } } };
+  if (seatClass)
+    where.flightSeat = { is: { seatClass: { equals: seatClass } } };
+  if (passengerType) where.passengerType = { equals: passengerType };
+  if (passengerName)
+    where.passengerName = { contains: passengerName, mode: "insensitive" };
+  if (passengerEmail)
+    where.passengerEmail = { contains: passengerEmail, mode: "insensitive" };
+
+  if (Object.keys(where).length === 0) {
+    throw new Error("At least one filter param is required");
+  }
+
+  const tickets = await prisma.ticket.findMany({
+    where,
+    skip,
+    take: pageSize,
+    include: {
+      flight: {
+        select: {
+          id: true,
+          flightNumber: true,
+          departureTime: true,
+          estimatedDeparture: true,
+          departureAirport: {
+            select: {
+              name: true,
+            },
+          },
+          arrivalAirport: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      flightSeat: {},
+      bookedBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+  const ticketsData = tickets.map((t) => {
+    return sanitize(t);
+  });
+
+  const totalTickets = await prisma.ticket.count({
+    where,
+  });
+
+  return {
+    tickets: ticketsData,
+    totalPages: Math.ceil(totalTickets / pageSize),
+    currentPage: page,
+  };
 };

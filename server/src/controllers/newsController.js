@@ -140,3 +140,14 @@ export const deleteNews = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const fitlterNews = async (req, res) => {
+  try {
+    const results = await newsRepository.filterNews(req.query);
+    res.status(200).json({ success: true, data: results });
+  } catch (err) {
+    if (err.message.includes('At least one')) return res.status(400).json({ success: false, error: err.message });
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};

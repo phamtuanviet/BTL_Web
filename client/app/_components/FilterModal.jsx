@@ -1,8 +1,8 @@
+"use client";
 import React, { useEffect, useRef, useState } from "react";
-import { redirect } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, X } from "lucide-react";
-import { toLocalDatetime } from "@/services/date";
+import { useRouter } from "next/navigation";
 
 const FilterModal = ({
   fields,
@@ -11,9 +11,10 @@ const FilterModal = ({
   option = {
     searchAirportsByQuery: null,
     searchAircraftsByQuery: null,
-    searchFlightsByQuery,
+    searchFlightsByQuery: null,
   },
 }) => {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [selectedFields, setSelectedFields] = useState([]);
   const [filterValues, setFilterValues] = useState(
@@ -79,7 +80,8 @@ const FilterModal = ({
     }
   };
 
-  const handleApplyFilters = () => {
+  const handleApplyFilters = (e) => {
+    e.preventDefault();
     const queryParams = new URLSearchParams();
 
     selectedFields.forEach((fieldName) => {
@@ -88,8 +90,8 @@ const FilterModal = ({
         queryParams.append(fieldName, value);
       }
     });
-
-    redirect(`/admin/${type}/filter?${queryParams.toString()}`);
+    router.push(`/admin/${type}/filter?${queryParams.toString()}`);
+    onClose();
   };
 
   return (
@@ -152,7 +154,7 @@ const FilterModal = ({
               </button>
             </div>
           ) : (
-            <form onSubmit={handleApplyFilters} className="space-y-4">
+            <form onSubmit={(e) => handleApplyFilters(e)} className="space-y-4">
               {fields
                 .filter((field) => selectedFields.includes(field.name))
                 .map((field) => {
@@ -189,7 +191,7 @@ const FilterModal = ({
                                 onClick={() => {
                                   setFilterValues((prev) => ({
                                     ...prev,
-                                    [field.name]: opt?.name || opt.flightNumber ,
+                                    [field.name]: opt?.name || opt.flightNumber,
                                   }));
                                   setSuggestions((s) => ({
                                     ...s,

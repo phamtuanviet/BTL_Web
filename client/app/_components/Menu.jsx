@@ -1,3 +1,5 @@
+"use client";
+import { logoutUser } from "@/redux/features/authSlice";
 import {
   House,
   LogOut,
@@ -10,9 +12,34 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import React from "react";
+import { useDispatch } from "react-redux";
+import Swal from "sweetalert2";
 
 const Menu = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const dispatch = useDispatch();
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Are you sure you want to logout?",
+      text: "You will have to log in again!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Logout",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(logoutUser());
+        localStorage.removeItem("persist:root.auth");
+        router.push("/");
+        console.log("Đã logout");
+      }
+    });
+  };
   return (
     <div className="mt-4 text-sm">
       <div className="flex flex-col gap-1">
@@ -72,6 +99,7 @@ const Menu = () => {
         <Link
           href={"/admin"}
           className="flex items-center justify-start gap-3 pl-3 hover:bg-gray-200"
+          onClick={handleLogout}
         >
           <LogOut />
           <span className="font-medium my-4">Logout</span>

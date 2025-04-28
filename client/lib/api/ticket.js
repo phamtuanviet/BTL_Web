@@ -36,6 +36,18 @@ const ticketService = {
     }
   },
 
+  filterTickets: async (filterData) => {
+    try {
+      filterData.page = filterData?.page || 1;
+      filterData.pageSize = filterData?.pageSize || 10;
+      return await ticketApi.get("/filter", {
+        params: filterData,
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+
   getTicketsBySearch: async (page, pageSize = 10, query, sortBy, sortOrder) => {
     try {
       const data = await ticketApi.get(`/get-tickets-by-search`, {

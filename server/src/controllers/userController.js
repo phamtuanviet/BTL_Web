@@ -72,6 +72,19 @@ export const getUsersBySearch = async (req, res) => {
   }
 };
 
+export const filterUsers = async (req, res) => {
+  try {
+    const users = await userRepository.filterUsers(req.query);
+    res.status(200).json({ success: true, data: users });
+  } catch (err) {
+    if (err.message.includes('At least one')) {
+      return res.status(400).json({ success: false, error: err.message });
+    }
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
 export const updateUser = async (req, res) => {
   try {
     const id = req.params.id;

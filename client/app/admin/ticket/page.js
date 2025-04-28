@@ -254,7 +254,7 @@ const page = () => {
               option={{
                 searchFlightsByQuery: searchListFlights,
               }}
-              type="news"
+              type="ticket"
             />
           )}
           {isSort && (

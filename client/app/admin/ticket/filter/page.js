@@ -3,27 +3,21 @@ import React, { useEffect, useState } from "react";
 import HearderAdmin from "@/app/_components/HearderAdmin";
 import Sidebar from "@/app/_components/Sidebar";
 import { Eye, Pen, SlidersHorizontal, X } from "lucide-react";
+import Swal from "sweetalert2";
 import Pagination from "@/app/_components/Pagination";
 import Table from "@/app/_components/Table";
-import {
-  columnFlights,
-  updateFlightsFormFields,
-  filterFlightFormFields,
-} from "@/data/hardData.js";
+import { filterTicketsFormFields, columnTickets } from "@/data/hardData.js";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import aircraftService from "@/lib/api/aircraft";
 import FilterModal from "@/app/_components/FilterModal";
 import flightService from "@/lib/api/flight";
-import airportService from "@/lib/api/airport";
-import UpdateFlight from "@/app/_components/UpdateFlight";
+import ticketService from "@/lib/api/ticket";
 
 const page = () => {
   const searchParams = useSearchParams();
-  const [flights, setFlights] = useState([]);
+  const [tickets, setTickets] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [editingItem, setEditingItem] = useState(null);
   const [isFilter, setIsFilter] = useState(false);
 
   const [allParams, setAllParams] = useState(() => {
@@ -38,12 +32,8 @@ const page = () => {
     setCurrentPage(page);
   };
 
-  const searchListAirports = async (q, { signal } = {}) => {
-    return await airportService.searchAirportsInFlight(q, { signal });
-  };
-
-  const searchListAircrafts = async (q, { signal } = {}) => {
-    return await aircraftService.searchAircraftsInFlight(q, { signal });
+  const searchListFlights = async (q, { signal } = {}) => {
+    return await flightService.searchFlightsInTicket(q, { signal });
   };
 
   const renderRow = (item) => (
@@ -51,36 +41,34 @@ const page = () => {
       key={item.id}
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-slate-200"
     >
-      <td className="font-sans">{item.id}</td>
-      <td className="font-sans">{item.flightNumber}</td>
-      <td className="font-sans">{item.departureAirport.name}</td>
-      <td className="font-sans">{item.arrivalAirport.name}</td>
-      <td className="font-sans">
-        {item.estimatedDeparture
-          ? new Date(item.estimatedDeparture).toLocaleString()
-          : new Date(item.departureTime).toLocaleString()}
+      <td className="font-sans hidden lg:table-cell">{item.id}</td>
+      <td className="font-sans hidden lg:table-cell">
+        {item.flight.flightNumber}
       </td>
+      <td className="font-sans">{item.passengerName}</td>
+      <td className="font-sans">{item.flight.departureAirport.name}</td>
+      <td className="font-sans">{item.flight.arrivalAirport.name}</td>
+
       <td className="font-sans">
-        {item.estimatedArrival
-          ? new Date(item.estimatedArrival).toLocaleString()
-          : new Date(item.arrivalTime).toLocaleString()}
+        {item.flight.estimatedDeparture
+          ? new Date(item.flight.estimatedDeparture).toLocaleString()
+          : new Date(item.flight.departureTime).toLocaleString()}
       </td>
-      <td className="hidden lg:table-cell font-sans">{item.status}</td>
-      <td className="hidden lg:table-cell font-sans">{item.totalSeats}</td>
-      <td className="hidden lg:table-cell font-sans">{item.bookedSeats}</td>
+      <td className="font-sans hidden lg:table-cell">{item.seatNumber}</td>
+      <td className="font-sans table-cell sm:hidden">
+        {item.bookingReference}
+      </td>
+      <td className="font-sans hidden lg:table-cell">{item.passengerType}</td>
+      <td className="font-sans hidden lg:table-cell">
+        {item.flightSeat.seatClass}
+      </td>
       <td>
         <div className="flex items-center gap-1">
-          <Link href={`/admin/user/${item.id}`}>
+          <Link href={`/admin/ticket/${item.id}`}>
             <button className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-200 cursor-pointer">
               <Eye className="w-[16px] h-[16px] text-white" />
             </button>
           </Link>
-          <button
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-green-200 cursor-pointer"
-            onClick={() => handleUpdate(item)}
-          >
-            <Pen className="w-[16px] h-[16px] text-white" />
-          </button>
         </div>
       </td>
     </tr>
@@ -92,12 +80,12 @@ const page = () => {
         page: currentPage,
         pageSize: 10,
       };
-      const res = await flightService.filterFlights(filterData);
-      setFlights(res?.data.flights);
+      const res = await ticketService.filterTickets(filterData);
+      setTickets(res?.data.tickets);
       setTotalPages(res?.data.totalPages);
     } catch (error) {
-      console.error("Error fetch flight:", error);
-      setFlights([]);
+      console.error("Error fetch tickets:", error);
+      setTickets([]);
     }
   };
 
@@ -109,38 +97,24 @@ const page = () => {
       }
       return params;
     });
-    setCurrentPage(1)
+    setCurrentPage(1);
   }, [searchParams]);
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  const handleUpdate = (item) => {
-    setEditingItem(item);
-  };
-
   const handleFilter = () => {
     setIsFilter(true);
-  };
-
-  const closeModal = () => {
-    setEditingItem(null);
   };
 
   const closeFilterModal = () => {
     setIsFilter(false);
   };
 
-  const submitUpdate = async (updatedValues) => {
-    await flightService.updateFlight(updatedValues.id, updatedValues);
-    fetchData();
-    closeModal();
-  };
-
   useEffect(() => {
     fetchData();
-  }, [currentPage,allParams]);
+  }, [currentPage, allParams]);
 
   return (
     <div className="h-screen w-full flex">
@@ -150,7 +124,7 @@ const page = () => {
         <div className="p-5 flex flex-col items-center justify-between">
           <div className="w-full md:w-[80%] flex flex-col  justify-between font-medium gap-2">
             <div className="flex flex-row items-center  justify-start gap-2">
-              <p>Filter Flights</p>
+              <p>Filter Tickets</p>
               <button
                 className="flex flex-row items-center justify-center rounded-full bg-yellow-200 p-2 cursor-pointer"
                 onClick={handleFilter}
@@ -169,30 +143,17 @@ const page = () => {
               ))}
             </div>
           </div>
-          <Table columns={columnFlights} renderRow={renderRow} data={flights} />
+          <Table columns={columnTickets} renderRow={renderRow} data={tickets} />
 
-          {editingItem && (
-            <UpdateFlight
-              key="update-flight"
-              item={editingItem}
-              onClose={closeModal}
-              onSubmit={submitUpdate}
-              updateFormFields={updateFlightsFormFields}
-              type="Flight"
-              searchAirportsByQuery={searchListAirports}
-              searchAircraftsByQuery={searchListAircrafts}
-            />
-          )}
           {isFilter && (
             <FilterModal
               key="filter-modal"
               onClose={closeFilterModal}
-              fields={filterFlightFormFields}
-              type="flight"
+              fields={filterTicketsFormFields}
               option={{
-                searchAirportsByQuery: searchListAirports,
-                searchAircraftsByQuery: searchListAircrafts,
+                searchFlightsByQuery: searchListFlights,
               }}
+              type="ticket"
             />
           )}
           <Pagination

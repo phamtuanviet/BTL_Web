@@ -640,6 +640,7 @@ export const filterUsersFormFields = [
     label: "Role",
     name: "role",
     type: "select",
+    defaultValue : "ADMIN",
     options: [
       { label: "Admin", value: "ADMIN" },
       { label: "User", value: "USER" },
@@ -649,6 +650,7 @@ export const filterUsersFormFields = [
     label: "Account Verified",
     name: "isAccountVerified",
     type: "select",
+    defaultValue : true,
     options: [
       { label: "Yes", value: true },
       { label: "No", value: false },
@@ -672,6 +674,7 @@ export const filterNewsFormFields = [
     label: "Public",
     name: "isPublished",
     type: "select",
+    defaultValue : true,
     options: [
       { label: "Yes", value: true },
       { label: "No", value: false },
@@ -719,7 +722,7 @@ export const filterFlightFormFields = [
     label: "Status",
     name: "status",
     type: "select",
-    defaultValue: "SHEDULED",
+    defaultValue: "SCHEDULED",
     options: [
       { label: "SCHEDULED", value: "SCHEDULED" },
       { label: "DELAYED", value: "DELAYED" },

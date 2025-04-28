@@ -8,6 +8,20 @@ import {
 } from "./flightSeatRepository.js";
 const prisma = new PrismaClient();
 
+const sanitize = (obj) => {
+  const converted = { ...obj };
+  for (const key in converted) {
+    const val = converted[key];
+    if (typeof converted[key] === "bigint") {
+      converted[key] = converted[key].toString();
+    }
+    if (val instanceof Date) {
+      converted[key] = val.toISOString();
+    }
+  }
+  return converted;
+};
+
 export const getAllFlights = async () => {
   return await prisma.flight.findMany();
 };
@@ -238,20 +252,6 @@ export const getFlightsBySearch = async (
     },
   });
 
-  const sanitize = (obj) => {
-    const converted = { ...obj };
-    for (const key in converted) {
-      const val = converted[key];
-      if (typeof converted[key] === "bigint") {
-        converted[key] = converted[key].toString();
-      }
-      if (val instanceof Date) {
-        converted[key] = val.toISOString();
-      }
-    }
-    return converted;
-  };
-
   const flightsWithStats = flights.map((f) => {
     const seatsByClass = f.seats.map((s) => ({
       seatClass: s.seatClass,
@@ -301,4 +301,105 @@ export const cancelFlight = async (id) => {
       status: "CANCELLED",
     },
   });
+};
+
+export const filterFlights = async (query) => {
+  const {
+    id,
+    flightNumber,
+    departureAirport,
+    arrivalAirport,
+    departureTime,
+    arrivalTime,
+    status,
+    aircraft,
+  } = query;
+  const page = parseInt(query.page) || 1;
+  const pageSize = parseInt(query.pageSize) || 10;
+
+  const where = {};
+  if (id) where.id = { equals: id };
+  if (flightNumber) where.flightNumber = { equals: flightNumber };
+  if (departureTime) {
+    const start = new Date(departureTime);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+    where.departureTime = { gte: start, lt: end };
+  }
+  if (arrivalTime) {
+    const startA = new Date(arrivalTime);
+    const endA = new Date(startA);
+    endA.setDate(endA.getDate() + 1);
+    where.arrivalTime = { gte: startA, lt: endA };
+  }
+  if (status) where.status = { equals: status };
+  if (departureAirport)
+    where.departureAirport = {
+      is: { name: { contains: departureAirport, mode: "insensitive" } },
+    };
+  if (arrivalAirport)
+    where.arrivalAirport = {
+      is: { name: { contains: arrivalAirport, mode: "insensitive" } },
+    };
+  if (aircraft)
+    where.aircraft = {
+      is: { name: { contains: aircraft, mode: "insensitive" } },
+    };
+
+  if (Object.keys(where).length === 0)
+    throw new Error("At least one filter param is required");
+
+  const skip = (page - 1) * pageSize;
+
+  const flights = await prisma.flight.findMany({
+    where,
+    skip,
+    take: pageSize,
+    include: {
+      departureAirport: {
+        select: { id: true, name: true, iataCode: true, icaoCode: true },
+      },
+      arrivalAirport: {
+        select: { id: true, name: true, iataCode: true, icaoCode: true },
+      },
+      aircraft: { select: { id: true, name: true, manufacturer: true } },
+      seats: {
+        select: {
+          price: true,
+          seatClass: true,
+          totalSeats: true,
+          bookedSeats: true,
+        },
+      },
+    },
+  });
+
+  const flightsWithStats = flights.map((f) => {
+    const seatsByClass = f.seats.map((s) => ({
+      seatClass: s.seatClass,
+      totalSeats: s.totalSeats,
+      bookedSeats: s.bookedSeats,
+      price: s.price,
+    }));
+
+    const totalSeats = seatsByClass.reduce((sum, s) => sum + s.totalSeats, 0);
+    const bookedSeats = seatsByClass.reduce((sum, s) => sum + s.bookedSeats, 0);
+
+    return sanitize({
+      ...f,
+      seats: seatsByClass,
+      totalSeats,
+      bookedSeats,
+    });
+  });
+
+  const totalFlights = await prisma.flight.count({
+    where,
+  });
+
+  return {
+    flights: flightsWithStats,
+    totalPages: Math.ceil(totalFlights / pageSize),
+    currentPage: page,
+  };
 };

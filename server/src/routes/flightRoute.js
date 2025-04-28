@@ -5,6 +5,7 @@ export const flightRoute = express.Router();
 
 flightRoute.get("/search-flights-in-ticket/:q",flightController.searchFlightsInTicket)
 flightRoute.get("/get-flights-by-search",flightController.getFlightsBySearch)
+flightRoute.get("/filter",flightController.filterFlights)
 flightRoute.get("/get-all-flight", flightController.getAllFlights);
 flightRoute.get("/:id", flightController.getFlightById);
 flightRoute.post("/", flightController.createFlight);

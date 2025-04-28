@@ -6,6 +6,7 @@ export const newsRoute = express.Router();
 
 newsRoute.get("/", newsController.getAllNews);
 newsRoute.get("/get-news-by-search" ,newsController.getNewsBySearch)
+newsRoute.get("/filter", newsController.fitlterNews);
 newsRoute.get("/get-last", newsController.getLatestNews);
 newsRoute.post("/", newsController.upload.single("thumbnail"), newsController.createNews);
 newsRoute.get("/:id", newsController.getNewsById);

@@ -3,24 +3,23 @@ import React, { useEffect, useState } from "react";
 import HearderAdmin from "@/app/_components/HearderAdmin";
 import Sidebar from "@/app/_components/Sidebar";
 import { Eye, Pen, SlidersHorizontal, X } from "lucide-react";
+import Swal from "sweetalert2";
 import Pagination from "@/app/_components/Pagination";
 import Table from "@/app/_components/Table";
 import {
-  columnFlights,
-  updateFlightsFormFields,
-  filterFlightFormFields,
+  columnNews,
+  updateNewsFormFields,
+  filterNewsFormFields,
 } from "@/data/hardData.js";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import aircraftService from "@/lib/api/aircraft";
+import UpdateModal from "@/app/_components/UpdateModal";
 import FilterModal from "@/app/_components/FilterModal";
-import flightService from "@/lib/api/flight";
-import airportService from "@/lib/api/airport";
-import UpdateFlight from "@/app/_components/UpdateFlight";
+import newsService from "@/lib/api/news";
 
 const page = () => {
   const searchParams = useSearchParams();
-  const [flights, setFlights] = useState([]);
+  const [news, setNews] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [editingItem, setEditingItem] = useState(null);
@@ -38,12 +37,23 @@ const page = () => {
     setCurrentPage(page);
   };
 
-  const searchListAirports = async (q, { signal } = {}) => {
-    return await airportService.searchAirportsInFlight(q, { signal });
-  };
-
-  const searchListAircrafts = async (q, { signal } = {}) => {
-    return await aircraftService.searchAircraftsInFlight(q, { signal });
+  const deleteNews = (item) => {
+    Swal.fire({
+      title: "Are you sure you want to delete?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await newsService.deleteNews(item.id);
+        fetchData();
+      }
+    });
   };
 
   const renderRow = (item) => (
@@ -51,26 +61,25 @@ const page = () => {
       key={item.id}
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-slate-200"
     >
-      <td className="font-sans">{item.id}</td>
-      <td className="font-sans">{item.flightNumber}</td>
-      <td className="font-sans">{item.departureAirport.name}</td>
-      <td className="font-sans">{item.arrivalAirport.name}</td>
-      <td className="font-sans">
-        {item.estimatedDeparture
-          ? new Date(item.estimatedDeparture).toLocaleString()
-          : new Date(item.departureTime).toLocaleString()}
+      <td className="font-sans table-cell lg:hidden">
+        <img
+          src={`${item.thumbnailUrl}`}
+          className="rounded-full w-[2rem] h-[2rem] overflow-hidden"
+        />
       </td>
-      <td className="font-sans">
-        {item.estimatedArrival
-          ? new Date(item.estimatedArrival).toLocaleString()
-          : new Date(item.arrivalTime).toLocaleString()}
+
+      <td className="font-sans ">{item.id}</td>
+      <td className="font-sans py-4">{item.title}</td>
+      <td className="font-sans hidden lg:table-cell">
+        {new Date(item.createdAt).toLocaleString()}
       </td>
-      <td className="hidden lg:table-cell font-sans">{item.status}</td>
-      <td className="hidden lg:table-cell font-sans">{item.totalSeats}</td>
-      <td className="hidden lg:table-cell font-sans">{item.bookedSeats}</td>
+      <td className="font-sans hidden lg:table-cell">
+        {new Date(item.updatedAt).toLocaleString()}
+      </td>
+      <td className="font-sans">{item.isPublished ? "Yes" : "No"}</td>
       <td>
         <div className="flex items-center gap-1">
-          <Link href={`/admin/user/${item.id}`}>
+          <Link href={`/admin/news/${item.id}`}>
             <button className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-200 cursor-pointer">
               <Eye className="w-[16px] h-[16px] text-white" />
             </button>
@@ -80,6 +89,12 @@ const page = () => {
             onClick={() => handleUpdate(item)}
           >
             <Pen className="w-[16px] h-[16px] text-white" />
+          </button>
+          <button
+            className="w-7 h-7 flex items-center justify-center rounded-full bg-red-200 cursor-pointer"
+            onClick={() => deleteNews(item)}
+          >
+            <X className="w-[16px] h-[16px] text-white" />
           </button>
         </div>
       </td>
@@ -92,12 +107,13 @@ const page = () => {
         page: currentPage,
         pageSize: 10,
       };
-      const res = await flightService.filterFlights(filterData);
-      setFlights(res?.data.flights);
+      console.log(filterData);
+      const res = await newsService.filterNews(filterData);
+      setNews(res?.data.news);
       setTotalPages(res?.data.totalPages);
     } catch (error) {
-      console.error("Error fetch flight:", error);
-      setFlights([]);
+      console.error("Error fetch news:", error);
+      setNews([]);
     }
   };
 
@@ -109,7 +125,7 @@ const page = () => {
       }
       return params;
     });
-    setCurrentPage(1)
+    setCurrentPage(1);
   }, [searchParams]);
 
   useEffect(() => {
@@ -133,14 +149,24 @@ const page = () => {
   };
 
   const submitUpdate = async (updatedValues) => {
-    await flightService.updateFlight(updatedValues.id, updatedValues);
+    const { id, title, createdAt, thumbnail, content, isPublished } =
+      updatedValues;
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("createdAt", createdAt);
+    formData.append("content", content);
+    formData.append("isPublished", isPublished);
+    if (thumbnail) {
+      formData.append("thumbnail", thumbnail);
+    }
+    await newsService.updateNews(id, formData);
     fetchData();
     closeModal();
   };
 
   useEffect(() => {
     fetchData();
-  }, [currentPage,allParams]);
+  }, [currentPage, allParams]);
 
   return (
     <div className="h-screen w-full flex">
@@ -150,7 +176,7 @@ const page = () => {
         <div className="p-5 flex flex-col items-center justify-between">
           <div className="w-full md:w-[80%] flex flex-col  justify-between font-medium gap-2">
             <div className="flex flex-row items-center  justify-start gap-2">
-              <p>Filter Flights</p>
+              <p>Filter News</p>
               <button
                 className="flex flex-row items-center justify-center rounded-full bg-yellow-200 p-2 cursor-pointer"
                 onClick={handleFilter}
@@ -169,30 +195,24 @@ const page = () => {
               ))}
             </div>
           </div>
-          <Table columns={columnFlights} renderRow={renderRow} data={flights} />
+          <Table columns={columnNews} renderRow={renderRow} data={news} />
 
           {editingItem && (
-            <UpdateFlight
-              key="update-flight"
+            <UpdateModal
+              key="update-modal"
               item={editingItem}
               onClose={closeModal}
               onSubmit={submitUpdate}
-              updateFormFields={updateFlightsFormFields}
-              type="Flight"
-              searchAirportsByQuery={searchListAirports}
-              searchAircraftsByQuery={searchListAircrafts}
+              updateFormFields={updateNewsFormFields}
+              type="News"
             />
           )}
           {isFilter && (
             <FilterModal
               key="filter-modal"
               onClose={closeFilterModal}
-              fields={filterFlightFormFields}
-              type="flight"
-              option={{
-                searchAirportsByQuery: searchListAirports,
-                searchAircraftsByQuery: searchListAircrafts,
-              }}
+              fields={filterNewsFormFields}
+              type="news"
             />
           )}
           <Pagination

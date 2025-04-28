@@ -75,6 +75,18 @@ const aircraftService = {
     }
   },
 
+  filterAircraft: async (filterData) => {
+    try {
+      filterData.page = filterData?.page || 1
+      filterData.pageSize = filterData?.pageSize || 10
+      return await aircraftApi.get("/filter", {
+        params : filterData
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+
   createNewAircraft: async (aircraftData) => {
     try {
       return await aircraftApi.post("/", aircraftData);

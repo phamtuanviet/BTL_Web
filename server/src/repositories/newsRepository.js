@@ -6,6 +6,20 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 
+const sanitizeNews = (news) => {
+  const converted = { ...news };
+  for (const key in converted) {
+    const val = converted[key];
+    if (typeof converted[key] === "bigint") {
+      converted[key] = converted[key].toString();
+    }
+    if (val instanceof Date) {
+      converted[key] = val.toISOString();
+    }
+  }
+  return converted;
+};
+
 const uploadThumbnailToCloudinary = async (file) => {
   try {
     const result = await new Promise((resolve, reject) => {
@@ -120,26 +134,13 @@ export const getNewsBySearch = async (
     take: pageSize,
     orderBy: orderByOption,
   });
-  const sanitizeNews = (news) => {
-    const converted = { ...news };
-    for (const key in converted) {
-      const val = converted[key];
-      if (typeof converted[key] === "bigint") {
-        converted[key] = converted[key].toString();
-      }
-      if (val instanceof Date) {
-        converted[key] = val.toISOString();
-      }
-    }
-    return converted;
-  };
   const sanitizedNews = news.map(sanitizeNews);
-  const totalAircrafts = await prisma.news.count({
+  const totalNews = await prisma.news.count({
     where: searchCondition,
   });
   return {
     news: sanitizedNews,
-    totalPages: Math.ceil(totalAircrafts / pageSize),
+    totalPages: Math.ceil(totalNews / pageSize),
     currentPage: page,
   };
 };
@@ -148,6 +149,51 @@ export const deleteNews = async (id) => {
   return await prisma.news.delete({
     where: { id },
   });
+};
+
+export const filterNews = async (query) => {
+  const operatorMap = {
+    id: "equals",
+    title: "contains",
+    isPublished: "equals",
+  };
+  const page = parseInt(query.page) || 1;
+  const pageSize = parseInt(query.pageSize) || 10;
+  const skip = (page - 1) * pageSize;
+  const where = {};
+  Object.entries(query).forEach(([key, val]) => {
+    if (!val || !operatorMap[key]) return;
+    if (key === "title") {
+      where[key] = {
+        [operatorMap[key]]: val,
+        mode: "insensitive",
+      };
+    } else if (key === "isPublished") {
+      where[key] = { [operatorMap[key]]: val === "true" };
+    } else if (key === "id") {
+      const num = parseInt(val, 10);
+      if (!isNaN(num)) {
+        where[key] = { [operatorMap[key]]: num };
+      }
+    }
+  });
+  if (Object.keys(where).length === 0)
+    throw new Error("At least one filter param is required");
+  const news = await prisma.news.findMany({
+    where,
+    skip,
+    take: pageSize,
+    orderBy: { createdAt: "desc" },
+  });
+  const sanitizedNews = news.map(sanitizeNews);
+  const totalNews = await prisma.news.count({
+    where,
+  });
+  return {
+    news: sanitizedNews,
+    totalPages: Math.ceil(totalNews / pageSize),
+    currentPage: page,
+  };
 };
 
 export const getLatestNews = async (skip, take) => {

@@ -114,3 +114,16 @@ export const deleteExistingAircraft = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const filterAircrafts = async (req, res) => {
+  try {
+    const results = await aircraftRepository.filterAircrafts(req.query);
+    res.status(200).json({ success: true, data: results });
+  } catch (err) {
+    if (err.message.includes('At least one')) {
+      return res.status(400).json({ success: false, error: err.message });
+    }
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};

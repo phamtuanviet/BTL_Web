@@ -190,7 +190,7 @@ const page = () => {
         <HearderAdmin />
         <div className="p-5 flex flex-col items-center justify-between">
           <div className="w-full md:w-[80%] flex flex-row justify-between items-center font-medium">
-            <p className="hidden md:block">All Users</p>
+            <p className="hidden md:block">All Flights</p>
             <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
               <div className="w-full md:w-auto flex  items-center rounded-full border-[1.5px] border-gray-300 px-2">
                 <Search

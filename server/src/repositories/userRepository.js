@@ -43,15 +43,6 @@ export const getUsersBySearch = async (
     take: pageSize,
     orderBy: orderByOption,
   });
-  const sanitizeUser = (user) => {
-    const converted = { ...user };
-    for (const key in converted) {
-      if (typeof converted[key] === "bigint") {
-        converted[key] = converted[key].toString();
-      }
-    }
-    return converted;
-  };
   const sanitizedUsers = users.map(sanitizeUser);
   const totalUsers = await prisma.user.count({
     where: searchCondition,
@@ -88,4 +79,57 @@ export const updateUser = async (id, newData) => {
 
   const sanitizedUser = sanitizeUser(user);
   return sanitizedUser;
+};
+
+export const filterUsers = async (query) => {
+  const operatorMap = {
+    id: "equals",
+    email: "contains",
+    role: "equals",
+    isAccountVerified: "equals",
+    name: "contains",
+  };
+  const page = parseInt(query.page) || 1;
+  const pageSize = parseInt(query.pageSize) || 10;
+  const skip = (page - 1) * pageSize;
+  const where = {};
+  Object.entries(query).forEach(([key, val]) => {
+    if (val == null || val === "" || !operatorMap[key]) return;
+  
+    let parsed = val;
+    if (key === "isAccountVerified") {
+      parsed = val === "true";
+    }
+  
+    if (operatorMap[key] === "contains") {
+      where[key] = {
+        contains: parsed,
+        mode: "insensitive"
+      };
+    } else {
+      where[key] = {
+        [operatorMap[key]]: parsed
+      };
+    }
+  });
+
+  if (Object.keys(where).length === 0) {
+    throw new Error("At least one filter param is required");
+  }
+
+  const users = await prisma.user.findMany({
+    where,
+    skip,
+    take: pageSize,
+  });
+
+  const sanitizedUsers = users.map(sanitizeUser);
+  const totalUsers = await prisma.user.count({
+    where,
+  });
+  return {
+    users: sanitizedUsers,
+    totalPages: Math.ceil(totalUsers / pageSize),
+    currentPage: page,
+  };
 };

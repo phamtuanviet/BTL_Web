@@ -34,6 +34,18 @@ const userService = {
     }
   },
 
+  filterUsers: async (filterData) => {
+    try {
+      filterData.page = filterData?.page || 1;
+      filterData.pageSize = filterData?.pageSize || 10;
+      return await userApi.get("/filter", {
+        params: filterData,
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+
   getUserBySearch: async (page, pageSize = 10, query,sortBy,sortOrder) => {
     try {
       const data = await userApi.get(`/get-users-by-search`, {

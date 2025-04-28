@@ -1,6 +1,16 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+const sanitizeAircraft = (aircraft) => {
+  const converted = { ...aircraft };
+  for (const key in converted) {
+    if (typeof converted[key] === "bigint") {
+      converted[key] = converted[key].toString();
+    }
+  }
+  return converted;
+};
+
 export const getAllAircrafts = async () => {
   return await prisma.aircraft.findMany();
 };
@@ -43,15 +53,6 @@ export const getAircraftsBySearch = async (
     take: pageSize,
     orderBy: orderByOption,
   });
-  const sanitizeAircraft = (aircraft) => {
-    const converted = { ...aircraft };
-    for (const key in converted) {
-      if (typeof converted[key] === "bigint") {
-        converted[key] = converted[key].toString();
-      }
-    }
-    return converted;
-  };
   const sanitizedAircrafts = aircrafts.map(sanitizeAircraft);
   const totalAircrafts = await prisma.aircraft.count({
     where: searchCondition,
@@ -107,4 +108,44 @@ export const deleteAircraft = async (id) => {
       id,
     },
   });
+};
+
+export const filterAircrafts = async (query) => {
+  const operatorMap = {
+    id: "equals",
+    name: "contains",
+    manufacturer: "contains",
+  };
+
+  const page = parseInt(query.page) || 1;
+  const pageSize = parseInt(query.pageSize) || 10;
+  const skip = (page - 1) * pageSize;
+  const where = {};
+  Object.entries(query).forEach(([key, val]) => {
+    if (val == null || val === "" || !operatorMap[key]) return;
+    where[key] = { [operatorMap[key]]: val };
+  });
+
+  if (Object.keys(where).length === 0) {
+    throw new Error("At least one filter param is required");
+  }
+
+  const aircrafts = await prisma.aircraft.findMany({
+    where,
+    skip,
+    take: pageSize,
+  });
+  console.log(aircrafts)
+
+  const sanitizedAircrafts = Array.isArray(aircrafts)
+    ? aircrafts.map(sanitizeAircraft)
+    : [];
+  const totalAircrafts = await prisma.aircraft.count({
+    where,
+  });
+  return {
+    aircrafts: sanitizedAircrafts,
+    totalPages: Math.ceil(totalAircrafts / pageSize),
+    currentPage: page,
+  };
 };
