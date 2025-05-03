@@ -8,8 +8,11 @@ import {
   findUserById,
   updateUser,
 } from "../repositories/userRepository.js";
+import { empty } from "@prisma/client/runtime/library";
 
 dotenv.config();
+
+
 
 export const register = async (req, res) => {
   try {
@@ -81,7 +84,7 @@ export const login = async (req, res) => {
     }
     if (user.isAccountVerified === true) {
       const token = jwt.sign(
-        { id: user.id, role: user.role },
+        { id: user.id, role: user.role, email: user.email },
         process.env.JWT_SECRET,
         {
           expiresIn: "7d",
@@ -94,9 +97,7 @@ export const login = async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         path: "/",
         domain:
-          process.env.NODE_ENV === "production"
-            ? "domain.com"
-            : "localhost",
+          process.env.NODE_ENV === "production" ? "domain.com" : "localhost",
         //domain: "localhost",
       });
     }
@@ -124,9 +125,7 @@ export const logout = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       path: "/",
       domain:
-        process.env.NODE_ENV === "production"
-          ? "domain.com"
-          : "localhost",
+        process.env.NODE_ENV === "production" ? "domain.com" : "localhost",
     });
     res.json({ success: true, message: "Logout successfully" });
   } catch (error) {
@@ -183,7 +182,7 @@ export const verifyEmail = async (req, res) => {
       return res.json({ success: false, message: "OTP Expired" });
     }
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user.id, role: user.role, email: user.email },
       process.env.JWT_SECRET,
       {
         expiresIn: "7d",
@@ -195,7 +194,8 @@ export const verifyEmail = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
-      domain: process.env.NODE_ENV === "production" ? "domain.com" : "localhost"
+      domain:
+        process.env.NODE_ENV === "production" ? "domain.com" : "localhost",
       //domain: "localhost",
     });
     const userUpdate = await updateUser(id, {
@@ -299,7 +299,8 @@ export const verifyResetOtp = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
-      domain: process.env.NODE_ENV === "production" ? "domain.com" : "localhost"
+      domain:
+        process.env.NODE_ENV === "production" ? "domain.com" : "localhost",
       //domain: "localhost",
     });
     if (user.isAccountVerified !== true) {

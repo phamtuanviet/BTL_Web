@@ -81,11 +81,31 @@ const ticketService = {
     }
   },
 
+  createTicketClient: async (ticketData) => {
+    try {
+      return await ticketApi.post("/ticket-client", ticketData, {
+        withCredentials: true,
+      });
+    } catch (error) {
+      toast.error(error.message || "Something went wrong");
+    }
+  },
+
   updateTicket: async (id, updateData) => {
     try {
       return await ticketApi.put(`/${id}`, updateData);
     } catch (error) {
       throw error;
+    }
+  },
+
+  cancelTicket: async (data) => {
+    try {
+      const res = await ticketApi.put(`/cancel`, data);
+      toast.success("Cancel successfully");
+      return res;
+    } catch (error) {
+      toast.error(error.message || "Something went wrong");
     }
   },
 
@@ -102,6 +122,14 @@ const ticketService = {
         "An error occurred";
       toast.error(msg);
       return null;
+    }
+  },
+  lookUpTicket: async (search) => {
+    try {
+      const res = await ticketApi.get(`/look-up/${search}`);
+      return res;
+    } catch (error) {
+      toast.error(error.message || "Something went wrong");
     }
   },
 };

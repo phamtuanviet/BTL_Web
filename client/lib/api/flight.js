@@ -85,6 +85,16 @@ const flightService = {
   },
 
 
+  searchFlightsByUser: async (searchData) => {
+    try {
+      return await flightApi.get("/search-flights-by-user", {
+        params: searchData,
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+  
   createFlight: async (flightData) => {
     try {
       return await flightApi.post("/", flightData);

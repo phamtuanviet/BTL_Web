@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Children, useEffect, useRef, useState } from "react";
 import {
   ArrowRightLeft,
   ArrowUpDown,
@@ -14,6 +14,8 @@ import {
 import airportService from "@/lib/api/airport";
 import { Calendar } from "@/components/ui/calendar";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 const Search = () => {
   const [tripType, setTripType] = useState("oneway");
   const [leavingFrom, setLeavingFrom] = useState("");
@@ -24,7 +26,7 @@ const Search = () => {
   const [airportSuggestions, setAirportSuggestions] = useState([]);
   const [isRotated, setIsRotated] = useState(true);
   const [passenger, setPassenger] = useState([1, 0, 0]);
-
+  const router = useRouter();
   const leavingButtonRef = useRef(null);
   const leavingContentRef = useRef(null);
   const goingButtonRef = useRef(null);
@@ -166,6 +168,30 @@ const Search = () => {
       day: "numeric",
     });
   };
+
+  const handleSearch = () => {
+    if (tripType === "oneway" && (!leavingFrom || !goingTo)) {
+      toast.error("Please fill all fields");
+    } else if (leavingFrom === goingTo) {
+      toast.error("Departure airport and arrivial airport must be difference");
+    } else {
+      const data = {
+        tripType,
+        departureAirport: leavingFrom,
+        arrivalAirport: goingTo,
+        startDate,
+        returnDate,
+        adults: passenger[0],
+        children: passenger[1],
+        infants: passenger[2],
+      };
+      console.log(data);
+      const payload = encodeURIComponent(JSON.stringify(data));
+      const href = `/search-flight?payload=${payload}`;
+      router.push(href);
+    }
+  };
+
   return (
     <div
       className="w-full flex flex-col justify-center text-center 
@@ -277,7 +303,7 @@ const Search = () => {
                   </div>
                 </div>
                 <div className="flex  justify-between w-[15rem] lg:w-[25rem]">
-                  <p className=" text-lg">Infants(-2)</p>
+                  <p className=" text-lg">infants(-2)</p>
                   <div className="flex gap-3">
                     <Minus
                       className={`rounded-full border-2 font-light w-[2rem] h-[2rem] ${
@@ -599,7 +625,10 @@ const Search = () => {
                 )}
               </div>
             )}
-            <button className="cursor-pointer px-5 py-2.5 rounded-3xl text-lg font-medium bg-primary text-white transform scale-100 hover:scale-105">
+            <button
+              className="cursor-pointer px-5 py-2.5 rounded-3xl text-lg font-medium bg-primary text-white transform scale-100 hover:scale-105"
+              onClick={handleSearch}
+            >
               Search
             </button>
           </div>

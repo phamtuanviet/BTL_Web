@@ -1,24 +1,43 @@
 "use client";
+import Loading from "@/app/_components/Loading";
+import ticketService from "@/lib/api/ticket";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Page = () => {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
-  const [check, isCheck] = useState(false);
+  const [check, setCheck] = useState(false);
   const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const raw = sessionStorage.getItem("dataPassengers");
     if (raw) setData(JSON.parse(raw));
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!/^\d{6}$/.test(otp)) {
       setError("OTP must be exactly 6 digits");
       return;
     }
     setError("");
+    const bodyRequest = {
+      ...data,
+      step: "verifyOtp",
+      otp,
+    };
+    setIsLoading(true);
+    const res = await ticketService.createTicketClient(bodyRequest);
+    setIsLoading(false);
+    if (res.success) {
+      setCheck(true);
+      router.push("/");
+      toast.success("Register ticket successfully");
+    }
   };
 
   const handleChange = (e) => {
@@ -26,7 +45,6 @@ const Page = () => {
     if (error) setError("");
   };
   console.log(data);
-
   return (
     <>
       {!check && (
@@ -59,7 +77,7 @@ const Page = () => {
           </div>
         </form>
       )}
-      
+      {isLoading && <Loading />}
     </>
   );
 };

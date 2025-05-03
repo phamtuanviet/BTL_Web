@@ -130,7 +130,7 @@ const CreateFlight = ({
           transition={{ duration: 0.3 }}
         >
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">{`Update ${type}`}</h2>
+            <h2 className="text-xl font-semibold">{`Create ${type}`}</h2>
             <button
               onClick={onClose}
               className="hover:bg-red-500 p-1 rounded-full"
@@ -293,7 +293,7 @@ const CreateFlight = ({
                       name={field.name}
                       type={field.type}
                       value={formValues[field.name]}
-                      placeholder={`Enter ${field.name}`}
+                      placeholder={field.placeholder || `Enter ${field.name}`}
                       onChange={handleChange}
                       readOnly={!field.editable}
                       disabled={!field.editable}

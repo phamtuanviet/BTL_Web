@@ -22,8 +22,7 @@ import { logoutUser } from "@/redux/features/authSlice";
 const Header = () => {
   const path = usePathname();
   const router = useRouter();
-  const { user, isLoading, isError, isSuccess, message, _persist } =
-    useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const handleLogin = () => {
     // Điều hướng đến trang /auth với isLogin=true (đăng nhập)
@@ -45,7 +44,7 @@ const Header = () => {
 
   return (
     <div className="flex p-6 justify-between shadow-sm sticky top-0 w-full z-[999] bg-white px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 mx-auto">
-      <Link  href={"/"}>
+      <Link href={"/"}>
         <div className="flex gap-1 items-center cursor-pointer font-bold">
           <Image alt="logo" width={70} height={70} src={"/images/logo.png"} />
           <p className="text-[1.5rem] text-primary">QAirLine</p>
@@ -61,18 +60,18 @@ const Header = () => {
             </li>
           </Link>
 
-          <Link href={"/about"}>
+          <Link href={"/look-up"}>
             <li
               className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer`}
             >
-              About
+              Look Up
             </li>
           </Link>
-          <Link href={"/discovery"}>
+          <Link href={"/your-flight"}>
             <li
               className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer`}
             >
-              Discovery
+              Your Flight
             </li>
           </Link>
           <Link href={"/news"}>
@@ -106,7 +105,7 @@ const Header = () => {
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 z-[9999]">
+            <DropdownMenuContent align="end" className="w-56 z-[999]">
               <DropdownMenuLabel className="font-bold text-1xl">
                 My Account
               </DropdownMenuLabel>

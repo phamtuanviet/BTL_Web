@@ -500,9 +500,10 @@ export const createFlightsFormFields = [
   {
     name: "flightNumber",
     label: "Flight Number",
-    type: "flightNumber",
-    required: true,
+    type: "text",
+    required: false,
     editable: true,
+    placeholder : "Fill or not (Auto generated)"
   },
   {
     name: "departureAirport",

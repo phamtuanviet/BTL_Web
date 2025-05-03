@@ -64,6 +64,27 @@ export const updateBookedSeat = async (id) => {
   });
 };
 
+export const updateManyBookedSeat = async (id, seatsToBook) => {
+  const seatId = Number(id);
+  const count = Number(seatsToBook);
+
+  return await prisma.$transaction(async (tx) => {
+    const flightSeat = await tx.flightSeat.findUnique({
+      where: { id: seatId },
+    });
+    if (!flightSeat) {
+      throw new Error("Flight seat not found");
+    }
+    if (flightSeat.bookedSeats + count > flightSeat.totalSeats) {
+      throw new Error("Not enough available seats in this class");
+    }
+    return tx.flightSeat.update({
+      where: { id: seatId },
+      data: { bookedSeats: { increment: count } },
+    });
+  });
+};
+
 export const deleteFlightSeat = async (id) => {
   return await prisma.flightSeat.delete({
     where: { id: Number(id) },

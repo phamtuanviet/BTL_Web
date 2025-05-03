@@ -6,3 +6,14 @@ export function generateBookingReference(length = 6) {
   }
   return result;
 }
+
+export function generateFlightNumber() {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const prefix =
+    letters[Math.floor(Math.random() * letters.length)] +
+    letters[Math.floor(Math.random() * letters.length)];
+
+  const number = Math.floor(1000 + Math.random() * 9000); // từ 1000 đến 9999
+
+  return `${prefix}${number}`;
+}

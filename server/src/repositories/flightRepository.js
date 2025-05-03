@@ -6,6 +6,7 @@ import {
   getFlightSeatBySeatClassAndFlight,
   updateFlightSeat,
 } from "./flightSeatRepository.js";
+import { generateFlightNumber } from "../services/other.js";
 const prisma = new PrismaClient();
 
 const sanitize = (obj) => {
@@ -57,6 +58,16 @@ export const createFlight = async (data) => {
   const departureAirport = await getAirportByName(data.departureAirport);
   const arrivalAirport = await getAirportByName(data.arrivalAirport);
   const aircraft = await getAircraftByName(data.aircraft);
+  if (!data.flightNumber) {
+    let isDuplicated = true;
+    while(isDuplicated){
+      data.flightNumber = generateFlightNumber();
+      const checkFlight = await prisma.flight.findUnique({
+        where: { flightNumber: data.flightNumber },
+      });
+      if(!checkFlight) isDuplicated = false;
+    }
+  }
   const flight = await prisma.flight.findUnique({
     where: { flightNumber: data.flightNumber },
   });
@@ -402,4 +413,113 @@ export const filterFlights = async (query) => {
     totalPages: Math.ceil(totalFlights / pageSize),
     currentPage: page,
   };
+};
+
+export const searchFlightsForUser = async (params) => {
+  const {
+    tripType,
+    departureAirport,
+    arrivalAirport,
+    startDate,
+    returnDate,
+    adults = 1,
+    children = 0,
+    infants = 0,
+  } = params;
+
+  if (!tripType || !departureAirport || !arrivalAirport || !startDate) {
+    throw new Error(
+      "tripType, departureAirport, arrivalAirport and startDate are required"
+    );
+  }
+  if (tripType === "twoway" && !returnDate) {
+    throw new Error("Return Date is required for twoway trip");
+  }
+
+  // Tổng số ghế cần đặt (infants không sử dụng ghế)
+  const totalPassengers = adults + children;
+  if (totalPassengers < 1) {
+    throw new Error("Must have at least 1 adult or child");
+  }
+
+  const buildWhere = (from, to, dateValue) => {
+    const start = new Date(dateValue);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    return {
+      departureAirport: {
+        is: { name: { contains: from, mode: "insensitive" } },
+      },
+      arrivalAirport: { is: { name: { contains: to, mode: "insensitive" } } },
+      OR: [
+        { status: "SCHEDULED", departureTime: { gte: start, lt: end } },
+        { status: "DELAYED", estimatedDeparture: { gte: start, lt: end } },
+      ],
+    };
+  };
+
+  const fetchAndFilter = async (where) => {
+    const flights = await prisma.flight.findMany({
+      where,
+      include: {
+        departureAirport: {
+          select: { id: true, name: true, iataCode: true, icaoCode: true },
+        },
+        arrivalAirport: {
+          select: { id: true, name: true, iataCode: true, icaoCode: true },
+        },
+        aircraft: { select: { id: true, name: true, manufacturer: true } },
+        seats: {
+          select: {
+            seatClass: true,
+            price: true,
+            totalSeats: true,
+            bookedSeats: true,
+          },
+        },
+      },
+    });
+
+    return flights.map((f) => {
+      const seatsWithAvailability = f.seats.map((s) => ({
+        ...s,
+        availableSeats: s.totalSeats - s.bookedSeats,
+      }));
+
+      const usable = seatsWithAvailability.filter(
+        (s) => s.availableSeats >= totalPassengers
+      );
+      if (!usable.length) {
+        return null;
+      }
+      return sanitize({ ...f, seats: usable });
+    });
+  };
+
+  const outboundWhere = buildWhere(departureAirport, arrivalAirport, startDate);
+  const outbound = await fetchAndFilter(outboundWhere);
+
+  if (!outbound.length) {
+    if (tripType === "oneway") return { outbound: [] };
+    throw new Error("No suitable trip found");
+  }
+
+  if (tripType === "twoway") {
+    const inboundWhere = buildWhere(
+      arrivalAirport,
+      departureAirport,
+      returnDate
+    );
+    const inbound = await fetchAndFilter(inboundWhere);
+
+    if (!inbound.length) {
+      throw new Error("No suitable trip found");
+    }
+
+    return { outbound, inbound };
+  }
+
+  return { outbound };
 };

@@ -101,8 +101,8 @@ model Ticket {
   id                    String    @id @default(uuid())
   flight                Flight    @relation(fields: [flightId], references: [id],onDelete: Restrict)
   flightId              String
-  passengerName         String
-  passengerEmail        String
+  passengerName         String?
+  passengerEmail        String?
   bookingReference      String    @unique
   seatNumber            String?
   isCancelled           Boolean   @default(false)
@@ -112,7 +112,10 @@ model Ticket {
   bookedBy              User?     @relation(fields: [bookedById], references: [id],onDelete: Restrict)
   bookedById            String?
   flightSeat            FlightSeat  @relation(fields: [flightSeatId], references: [id],onDelete: Restrict)
-  flightSeatId          Int      
+  flightSeatId          Int     
+  passenger             Passenger?    @relation("Ticket_Passenger", fields: [passengerId], references: [id])
+  passengerId           String? 
+  cancelCode            String    @unique
 }
 
 model Aircraft {
@@ -135,4 +138,22 @@ model FlightSeat {
 
   @@unique([flightId, seatClass])
 
+}
+
+model Passenger {
+  id        String   @id @default(uuid())
+  fullName  String
+  email     String
+  dob       DateTime?    
+  passport  String?      
+  tickets   Ticket[]     @relation("Ticket_Passenger")
+}
+
+model EmailVerification {
+  id        String   @id @default(uuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  @@index([email])
 }

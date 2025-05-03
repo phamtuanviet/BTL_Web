@@ -4,6 +4,7 @@ import {
   getFlightSeatById,
   getFlightSeatBySeatClassAndFlight,
   updateBookedSeat,
+  updateFlightSeat,
 } from "./flightSeatRepository.js";
 import { getFlightByFlightNumber, getFlightById } from "./flightRepository.js";
 import { generateBookingReference } from "../services/other.js";
@@ -31,7 +32,7 @@ export const getAllTicketsFromFlight = async (flightId) => {
 
 export const getTicketById = async (id) => {
   return await prisma.ticket.findUnique({
-    where: { id: Number(id) },
+    where: { id },
   });
 };
 
@@ -217,9 +218,13 @@ export const updateTicket = async (id, data) => {
   });
 };
 
-export const cancelTicket = async (id) => {
-  const ticket = await prisma.ticket.findUnique({
-    where: { id: Number(id), isCancelled: false },
+export const cancelTicket = async ({ id, cancelCode }) => {
+  const ticket = await prisma.ticket.findFirst({
+    where: {
+      id,
+      isCancelled: false,
+      cancelCode,
+    },
   });
 
   if (!ticket) {
@@ -230,8 +235,13 @@ export const cancelTicket = async (id) => {
   if (currentTime > ticket.cancellationDeadline) {
     throw new Error("Cancel time limit expired");
   }
+  const flightSeat = await getFlightSeatById(ticket.flightSeatId);
+  await updateFlightSeat(flightSeat.id, {
+    bookedSeats: flightSeat.bookedSeats - 1,
+  });
+
   return await prisma.ticket.update({
-    where: { id: Number(id) },
+    where: { id },
     data: {
       isCancelled: true,
     },
@@ -240,7 +250,7 @@ export const cancelTicket = async (id) => {
 
 export const deleteTicket = async (id) => {
   return await prisma.ticket.delete({
-    where: { id: Number(id) },
+    where: { id },
   });
 };
 export const filterTickets = async (query) => {
@@ -317,4 +327,120 @@ export const filterTickets = async (query) => {
     totalPages: Math.ceil(totalTickets / pageSize),
     currentPage: page,
   };
+};
+
+export const createTicketV2 = async ({
+  flightId,
+  passengerType,
+  passengerId,
+  flightSeatId,
+  bookingReference,
+  bookedById,
+  cancelCode,
+}) => {
+  const count = await prisma.ticket.count({
+    where: {
+      flightId,
+      flightSeatId,
+    },
+  });
+  const flightSeat = await getFlightSeatById(flightSeatId);
+
+  const seatNumber = `${flightSeat.seatClass.charAt(0).toUpperCase()}${count}`;
+  return await prisma.ticket.create({
+    data: {
+      flightId,
+      passengerType,
+      passengerId,
+      flightSeatId,
+      bookingReference,
+      bookedById: bookedById ?? null,
+      seatNumber,
+      cancelCode,
+    },
+  });
+};
+
+export const lookUpTickets = async (search) => {
+  const tickets = await prisma.ticket.findMany({
+    where: {
+      OR: [
+        { passengerEmail: search },
+        { bookingReference: search },
+        {
+          passenger: {
+            email: search,
+          },
+        },
+      ],
+      isCancelled: false,
+    },
+    select: {
+      id: true,
+      bookingReference: true,
+      passengerName: true,
+      passengerEmail: true,
+      passengerType: true,
+      discount: true,
+      bookedAt: true,
+      seatNumber: true,
+
+      passenger: {
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          dob: true,
+          passport: true,
+        },
+      },
+      flightSeat: {
+        select: {
+          id: true,
+          seatClass: true,
+          price: true,
+        },
+      },
+      flight: {
+        select: {
+          id: true,
+          flightNumber: true,
+          departureTime: true,
+          arrivalTime: true,
+          status: true,
+          departureAirport: {
+            select: {
+              id: true,
+              name: true,
+              city: true,
+              country: true,
+              iataCode: true,
+              icaoCode: true,
+            },
+          },
+          arrivalAirport: {
+            select: {
+              id: true,
+              name: true,
+              city: true,
+              country: true,
+              iataCode: true,
+              icaoCode: true,
+            },
+          },
+          seats: {
+            select: {
+              id: true,
+              seatClass: true,
+              totalSeats: true,
+              bookedSeats: true,
+              price: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return tickets;
 };

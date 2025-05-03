@@ -37,7 +37,6 @@ export const createFlight = async (req, res) => {
       return res.status(500).json({ success: false, message: "Invalid time" });
     }
     if (
-      !flightNumber ||
       !departureAirport ||
       !arrivalAirport ||
       !departureTime ||
@@ -51,15 +50,9 @@ export const createFlight = async (req, res) => {
         data: req.body,
       });
     }
-    const newFlight = await flightRepository.createFlight({
-      flightNumber,
-      departureAirport,
-      arrivalAirport,
-      departureTime,
-      arrivalTime,
-      aircraft,
-      seats,
-    });
+    const newFlight = await flightRepository.createFlight(
+      req.body
+    );
     res.status(201).json({ success: true, data: newFlight });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -149,3 +142,15 @@ export const filterFlights = async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+export const searchFlightsForUser = async (req, res) => {
+  try {
+    const data = await flightRepository.searchFlightsForUser(req.query);
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    if (err.message.includes('At least one')) return res.status(400).json({ success: false, error: err.message });
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message || 'Internal server error' });
+  }
+};
+
