@@ -1,12 +1,10 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import HearderAdmin from "@/app/_components/HearderAdmin";
 import Sidebar from "@/app/_components/Sidebar";
 import {
   ArrowDownWideNarrow,
   Eye,
-  Pen,
-  Plus,
   Search,
   SlidersHorizontal,
   X,
@@ -15,29 +13,13 @@ import Swal from "sweetalert2";
 import Pagination from "@/app/_components/Pagination";
 import Table from "@/app/_components/Table";
 import {
-  updateAircraftsFormFields,
-  columnAircrafts,
-  createAircraftsFormFields,
-  filterAircraftsFormFields,
-  sortAircraftFormFields,
-  columnNews,
-  updateNewsFormFields,
-  sortNewsFormFields,
-  filterNewsFormFields,
-  createNewsFormFields,
   columnTickets,
-  createTicketsFormFields,
   sortTicketFormFields,
   filterTicketsFormFields,
 } from "@/data/hardData.js";
 import Link from "next/link";
-import UpdateModal from "@/app/_components/UpdateModal";
-import aircraftService from "@/lib/api/aircraft";
-import CreateModal from "@/app/_components/CreateModal";
 import FilterModal from "@/app/_components/FilterModal";
 import SortModal from "@/app/_components/SortModal";
-import Image from "next/image";
-import newsService from "@/lib/api/news";
 import ticketService from "@/lib/api/ticket";
 import flightService from "@/lib/api/flight";
 const page = () => {
@@ -45,8 +27,6 @@ const page = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [query, setQuery] = useState("");
-  const [editingItem, setEditingItem] = useState(null);
-  const [isCreate, setIsCreate] = useState(false);
   const [isFilter, setIsFilter] = useState(false);
   const [isSort, setIsSort] = useState(false);
   const [sortBy, setSortBy] = useState("id");
@@ -55,46 +35,34 @@ const page = () => {
     setCurrentPage(page);
   };
 
-  const deleteNews = (item) => {
-    Swal.fire({
-      title: "Are you sure you want to delete?",
-      text: "This action cannot be undone!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Delete",
-      cancelButtonText: "Cancel",
-      reverseButtons: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await newsService.deleteNews(item.id);
-        fetchData(currentPage, 10, query, sortBy, sortOrder);
-      }
-    });
-  };
-
   const renderRow = (item) => (
     <tr
       key={item.id}
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-slate-200"
     >
       <td className="font-sans hidden lg:table-cell">{item.id}</td>
-      <td className="font-sans hidden lg:table-cell">{item.flight.flightNumber}</td>
-      <td className="font-sans">{item.passengerName}</td>
+      <td className="font-sans hidden lg:table-cell">
+        {item.flight.flightNumber}
+      </td>
+      <td className="font-sans hidden lg:table-cell">{item.passenger.fullName}</td>
       <td className="font-sans">{item.flight.departureAirport.name}</td>
       <td className="font-sans">{item.flight.arrivalAirport.name}</td>
-      
+
       <td className="font-sans">
         {item.flight.estimatedDeparture
           ? new Date(item.flight.estimatedDeparture).toLocaleString()
           : new Date(item.flight.departureTime).toLocaleString()}
       </td>
       <td className="font-sans hidden lg:table-cell">{item.seatNumber}</td>
-      <td className="font-sans table-cell sm:hidden">{item.bookingReference}</td>
+      <td className="font-sans table-cell sm:hidden">
+        {item.bookingReference}
+      </td>
       <td className="font-sans hidden lg:table-cell">{item.passengerType}</td>
       <td className="font-sans hidden lg:table-cell">
         {item.flightSeat.seatClass}
+      </td>
+      <td>
+        {item.isCancelled ? "Yes" : "No"}
       </td>
       <td>
         <div className="flex items-center gap-1">
@@ -141,17 +109,6 @@ const page = () => {
   const handleFilter = () => {
     setIsFilter(true);
   };
-  const closeModal = () => {
-    setEditingItem(null);
-  };
-
-  const closeCreateModal = () => {
-    setIsCreate(false);
-  };
-
-  const handleCreate = () => {
-    setIsCreate(true);
-  };
 
   const closeFilterModal = () => {
     setIsFilter(false);
@@ -163,12 +120,6 @@ const page = () => {
 
   const handleSort = () => {
     setIsSort(true);
-  };
-
-  const submitCreate = async (createValues) => {
-    await ticketService.createTicket(createValues);
-    fetchData(currentPage, 10, query, sortBy, sortOrder);
-    closeCreateModal();
   };
 
   const submitSort = async (sortData) => {
@@ -223,29 +174,11 @@ const page = () => {
                 >
                   <ArrowDownWideNarrow className="w-[14px] h-[14px]" />
                 </button>
-                <button
-                  className="flex flex-row items-center justify-center rounded-full bg-yellow-200 p-2 cursor-pointer"
-                  onClick={() => handleCreate()}
-                >
-                  <Plus className="w-[14px] h-[14px]" />
-                </button>
               </div>
             </div>
           </div>
           <Table columns={columnTickets} renderRow={renderRow} data={tickets} />
 
-          {isCreate && (
-            <CreateModal
-              key="create-modal"
-              onClose={closeCreateModal}
-              onSubmit={submitCreate}
-              createFormFields={createTicketsFormFields}
-              option={{
-                searchFlightsByQuery: searchListFlights,
-              }}
-              type="Ticket"
-            />
-          )}
           {isFilter && (
             <FilterModal
               key="filter-modal"

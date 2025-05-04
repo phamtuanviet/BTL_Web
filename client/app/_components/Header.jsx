@@ -67,13 +67,13 @@ const Header = () => {
               Look Up
             </li>
           </Link>
-          <Link href={"/your-flight"}>
+          {user && user?.isAccountVerified && <Link href={"/your-flight"}>
             <li
               className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer`}
             >
               Your Flight
             </li>
-          </Link>
+          </Link>}
           <Link href={"/news"}>
             <li
               className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer`}

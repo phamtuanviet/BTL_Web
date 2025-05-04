@@ -10,7 +10,7 @@ const ticketApi = axios.create({
 ticketApi.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    return Promise.reject(error.response?.data.message || error.message);
+    return Promise.reject(error);
   }
 );
 
@@ -19,7 +19,8 @@ const ticketService = {
     try {
       return await ticketApi.get("/");
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -32,7 +33,8 @@ const ticketService = {
         },
       });
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -44,7 +46,8 @@ const ticketService = {
         params: filterData,
       });
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -61,7 +64,8 @@ const ticketService = {
       });
       return data;
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -69,7 +73,8 @@ const ticketService = {
     try {
       return await ticketApi.get(`/${id}`);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -77,7 +82,8 @@ const ticketService = {
     try {
       return await ticketApi.post("/", ticketData);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -87,7 +93,8 @@ const ticketService = {
         withCredentials: true,
       });
     } catch (error) {
-      toast.error(error.message || "Something went wrong");
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -95,7 +102,8 @@ const ticketService = {
     try {
       return await ticketApi.put(`/${id}`, updateData);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -105,7 +113,8 @@ const ticketService = {
       toast.success("Cancel successfully");
       return res;
     } catch (error) {
-      toast.error(error.message || "Something went wrong");
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -115,21 +124,19 @@ const ticketService = {
       toast.success("delete success");
       return data;
     } catch (error) {
-      const msg =
-        error?.response?.data?.message ||
-        error.message ||
-        error ||
-        "An error occurred";
-      toast.error(msg);
+      toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
     }
   },
-  lookUpTicket: async (search) => {
+  lookUpTicket: async (search = "") => {
     try {
-      const res = await ticketApi.get(`/look-up/${search}`);
+      const res = await ticketApi.get(`/look-up/${search}`, {
+        withCredentials: true,
+      });
       return res;
     } catch (error) {
-      toast.error(error.message || "Something went wrong");
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 };

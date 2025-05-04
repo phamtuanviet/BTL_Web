@@ -36,8 +36,8 @@ export const createNews = async (req, res) => {
   try {
     const { title, content, createdAt } = req.body;
     const isPublished = req.body.isPublished === "true";
-    const thumbnailFile = req.file;
-    if (!title?.trim() || !content?.trim() || !thumbnailFile) {
+    const thumbnailFile = req?.file || null;
+    if (!title?.trim() || !content?.trim()) {
       return res
         .status(400)
         .json({ success: false, message: "Missing required field" });
@@ -50,7 +50,7 @@ export const createNews = async (req, res) => {
       content,
       thumbnailFile,
       createdAtValue,
-      isPublished,
+      isPublished
     );
     res.status(201).json({ success: true, data: newNews });
   } catch (error) {
@@ -146,8 +146,9 @@ export const fitlterNews = async (req, res) => {
     const results = await newsRepository.filterNews(req.query);
     res.status(200).json({ success: true, data: results });
   } catch (err) {
-    if (err.message.includes('At least one')) return res.status(400).json({ success: false, error: err.message });
+    if (err.message.includes("At least one"))
+      return res.status(400).json({ success: false, error: err.message });
     console.error(err);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

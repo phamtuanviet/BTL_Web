@@ -51,13 +51,17 @@ const Ticket = ({ data, handleCancel }) => {
             <p className="font-light text-xl">
               Departure time:{" "}
               <span className="font-bold text-[1.5xl]">
-                {`${new Date(data.flight.departureTime).toLocaleString()}`}
+                {data.flight.estimatedDeparture
+                  ? new Date(data.flight.estimatedDeparture).toLocaleString()
+                  : new Date(data.flight.departureTime).toLocaleString()}
               </span>
             </p>
             <p className="font-light text-xl">
               Arrival time:{" "}
               <span className="font-bold text-[1.5xl]">
-                {`${new Date(data.flight.arrivalTime).toLocaleString()}`}
+                {data.flight.estimatedArrival
+                  ? new Date(data.flight.estimatedArrival).toLocaleString()
+                  : new Date(data.flight.arrivalTime).toLocaleString()}
               </span>
             </p>
             <p className="font-light text-xl">

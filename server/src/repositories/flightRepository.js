@@ -60,12 +60,12 @@ export const createFlight = async (data) => {
   const aircraft = await getAircraftByName(data.aircraft);
   if (!data.flightNumber) {
     let isDuplicated = true;
-    while(isDuplicated){
+    while (isDuplicated) {
       data.flightNumber = generateFlightNumber();
       const checkFlight = await prisma.flight.findUnique({
         where: { flightNumber: data.flightNumber },
       });
-      if(!checkFlight) isDuplicated = false;
+      if (!checkFlight) isDuplicated = false;
     }
   }
   const flight = await prisma.flight.findUnique({
@@ -111,6 +111,13 @@ export const createFlight = async (data) => {
 
 export const updatedFlight = async (id, data) => {
   const { estimatedDeparture, estimatedArrival, seats } = data;
+  const estimatedDepartureTime = estimatedDeparture
+    ? new Date(estimatedDeparture)
+    : null;
+  const estimatedArrivalTime = estimatedArrival
+    ? new Date(estimatedArrival)
+    : null;
+  console.log(data);
   const flight = await prisma.flight.findUnique({
     where: {
       id,
@@ -123,10 +130,13 @@ export const updatedFlight = async (id, data) => {
     throw new Error("Flight not found or has taken off");
   }
 
+  console.log(flight);
+
   if (
-    estimatedDeparture < flight.departureTime &&
-    (flight.estimatedDeparture === null ||
-      estimatedDeparture < flight.estimatedDeparture)
+    (estimatedDepartureTime < flight.departureTime &&
+      flight.estimatedDeparture == null) ||
+    (flight.estimatedDeparture != null &&
+      estimatedDepartureTime < flight.estimatedDeparture)
   ) {
     throw new Error(
       "The flight's schedule prevents an early departure, which may inconvenience the customer."
@@ -143,9 +153,20 @@ export const updatedFlight = async (id, data) => {
     };
     await updateFlightSeat(oldSeat.id, dataSeat);
   });
+
+  if (
+    (estimatedDepartureTime === flight.departureTime ||
+      estimatedDepartureTime === flight.estimatedDeparture) &&
+    (estimatedArrivalTime === flight.estimatedArrival ||
+      estimatedArrivalTime === flight.arrivalTime)
+  ) {
+    return flight;
+  }
+
   const flightData = {
     estimatedDeparture,
     estimatedArrival,
+    status: "DELAYED",
   };
 
   return await prisma.flight.update({
@@ -444,9 +465,9 @@ export const searchFlightsForUser = async (params) => {
 
   const buildWhere = (from, to, dateValue) => {
     const start = new Date(dateValue);
-    start.setHours(0, 0, 0, 0);
     const end = new Date(start);
     end.setDate(end.getDate() + 1);
+    console.log(start, end);
 
     return {
       departureAirport: {

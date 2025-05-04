@@ -123,7 +123,7 @@ export const cancelTicket = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: "Id and cancelCode are required" });
-    console.log(req.body)
+    console.log(req.body);
     const ticket = await ticketRepository.cancelTicket({ id, cancelCode });
     res.status(200).json({ success: true, data: ticket });
   } catch (error) {
@@ -300,7 +300,8 @@ export const lookUpTicket = async (req, res) => {
   try {
     const search = req?.params?.search || null;
     let dataSearch = search;
-    if (!search) {
+    if (!search || search === "none") {
+      console.log("Hi");
       let userEmail = null;
       const { token } = req.cookies;
       const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
@@ -311,6 +312,7 @@ export const lookUpTicket = async (req, res) => {
           .status(400)
           .json({ success: false, message: "Data search is required" });
     }
+
     const tickets = await ticketRepository.lookUpTickets(dataSearch);
     res.status(200).json({ success: true, data: tickets });
   } catch (error) {

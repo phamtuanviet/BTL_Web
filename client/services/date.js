@@ -38,7 +38,7 @@ export const getDobMaxDate = (type) => {
   switch (type) {
     case "adult":
       return formatDate(
-        new Date(today.getFullYear() - 18, today.getMonth(), today.getDate())
+        new Date(today.getFullYear() - 12, today.getMonth(), today.getDate())
       );
     case "child":
       return formatDate(

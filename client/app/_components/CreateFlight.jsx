@@ -52,9 +52,13 @@ const CreateFlight = ({
     const ctrl = new AbortController();
     abortControllers.current[fieldName] = ctrl;
     try {
-      const { data } = await searchFn(value, {
+      const result = await searchFn(value, {
         signal: ctrl?.signal || undefined,
       });
+      if (!result) {
+        return;
+      }
+      const { data } = result;
       setSuggestions((s) => ({ ...s, [fieldName]: data }));
     } catch (err) {
       if (

@@ -37,6 +37,10 @@ const UpdateFlight = ({
         });
       } else if (field.type === "aircraft" || field.type === "airport") {
         acc[field.name] = item[field.name].name;
+      } else if (field.name === "departureTime") {
+        acc[field.name] = item["estimatedDeparture"] || item["departureTime"];
+      } else if (field.name === "arrivalTime") {
+        acc[field.name] = item["estimatedArrival"] || item["arrivalTime"];
       } else {
         acc[field.name] = item[field.name] ?? "";
       }

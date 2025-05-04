@@ -58,11 +58,14 @@ export const getAllNews = async () => {
 export const createNews = async (
   title,
   content,
-  thumbnailFile,
+  thumbnailFile = null,
   createdAt = new Date(),
   isPublished = false
 ) => {
-  const thumbnailUrl = await uploadThumbnailToCloudinary(thumbnailFile);
+  let thumbnailUrl = null;
+  if (thumbnailFile) {
+    thumbnailUrl = await uploadThumbnailToCloudinary(thumbnailFile);
+  }
 
   return await prisma.news.create({
     data: {

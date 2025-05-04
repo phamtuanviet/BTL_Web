@@ -9,14 +9,22 @@ import ticketService from "@/lib/api/ticket";
 const page = () => {
   const [query, setQuery] = useState("");
   const [dataTickets, setDataTickets] = useState([]);
+  const [noResult, setNoResult] = useState(false);
 
   const handleSearch = async () => {
     if (query) {
       const newData = await ticketService.lookUpTicket(query);
+      if (newData.data.length === 0) setNoResult(true);
       setDataTickets(newData.data);
     } else {
       setDataTickets([]);
+      setNoResult(true);
     }
+  };
+
+  const handleChangeQuery = (e) => {
+    if (noResult) setNoResult(false);
+    setQuery(e.target.value);
   };
   return (
     <>
@@ -34,16 +42,21 @@ const page = () => {
           />
           <input
             type="text"
-            placeholder="Search by Booking Refference..."
+            placeholder="Search by Booking Refference or Email..."
             className="w-[200px] p-2 bg-transparent outline-none flex-[1]"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleChangeQuery}
           />
         </div>
         {dataTickets &&
           dataTickets.map((ticket, index) => (
             <Ticket key={index} data={ticket} handleCancel={handleSearch} />
           ))}
+        {noResult && (
+          <div className="min-h-[30rem] flex items-center justify-center">
+            <p className="font-bold text-3xl">No Result</p>
+          </div>
+        )}
       </div>
     </>
   );

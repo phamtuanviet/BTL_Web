@@ -37,12 +37,11 @@ const NewsPage = () => {
   const formatContent = (text) => {
     if (!text || typeof text !== "string") return null;
 
+    const normalizedText = text.replace(/\\n/g, "\n");
 
-    const normalizedText = text.replace(/\\n/g, '\n');
-    
     return normalizedText.split(/\n{2,}/g).map((paragraph, pIndex) => (
       <p key={`para-${pIndex}`} className="mb-4 text-gray-700 leading-relaxed">
-        {paragraph.split('\n').map((line, lIndex, lines) => (
+        {paragraph.split("\n").map((line, lIndex, lines) => (
           <React.Fragment key={`line-${pIndex}-${lIndex}`}>
             {line}
             {lIndex !== lines.length - 1 && <br />}
@@ -77,7 +76,7 @@ const NewsPage = () => {
         {error && (
           <div className="w-full max-w-3xl text-red-500 text-center py-8">
             {error}
-            <button 
+            <button
               onClick={fetchNews}
               className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
@@ -102,16 +101,14 @@ const NewsPage = () => {
               </p>
             </header>
 
-            {news.thumbnailUrl && (
-              <figure className="relative w-full aspect-[16/9] rounded-lg overflow-hidden">
-                <img
-                  src={news.thumbnailUrl}
-                  alt={news.title || "Ảnh minh họa bài viết"}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </figure>
-            )}
+            <figure className="relative w-full aspect-[16/9] rounded-lg overflow-hidden">
+              <img
+                src={news?.thumbnailUrl || "/images/info.png"}
+                alt={news.title || "Ảnh minh họa bài viết"}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </figure>
 
             <div className="prose max-w-none">
               {formatContent(news.content)}
@@ -119,7 +116,7 @@ const NewsPage = () => {
           </article>
         )}
       </div>
-      
+
       <News />
       <Footer />
     </>

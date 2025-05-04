@@ -75,7 +75,7 @@ const page = () => {
     >
       <td className="font-sans table-cell lg:hidden">
         <img
-          src={`${item.thumbnailUrl}`}
+          src={`${item?.thumbnailUrl || "/images/info.png"}`}
           className="rounded-full w-[2rem] h-[2rem] overflow-hidden"
         />
       </td>

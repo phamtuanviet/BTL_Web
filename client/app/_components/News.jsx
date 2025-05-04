@@ -125,7 +125,7 @@ const News = () => {
               style={{ width: `${slideWidth}%` }}
             >
               <Slide
-                image={slide.thumbnailUrl}
+                image={slide?.thumbnailUrl || "/images/info.png"}
                 title={slide.title}
                 createdAt={slide.createdAt}
               />

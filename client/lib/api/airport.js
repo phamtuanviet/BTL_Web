@@ -1,5 +1,6 @@
 // services/api/airport.js
 import axios from "axios";
+import { toast } from "sonner";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL + "/airport";
 
@@ -14,7 +15,7 @@ const airportApi = axios.create({
 airportApi.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    return Promise.reject(error.response?.data.message || error.message);
+    return Promise.reject(error);
   }
 );
 
@@ -23,7 +24,8 @@ const airportService = {
     try {
       return await airportApi.get("/get-all-airports");
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -31,7 +33,8 @@ const airportService = {
     try {
       return await airportApi.get(`/get/${id}`);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -39,7 +42,8 @@ const airportService = {
     try {
       return await airportApi.get(`/search-airports/${searchTerm}`);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -49,7 +53,9 @@ const airportService = {
         signal,
       });
     } catch (error) {
-      throw error;
+      if (error.message === "canceled") return;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -57,7 +63,8 @@ const airportService = {
     try {
       return await airportApi.post("/create", airportData);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -65,7 +72,8 @@ const airportService = {
     try {
       return await airportApi.put(`/update/${id}`, updateData);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -73,7 +81,8 @@ const airportService = {
     try {
       return await airportApi.delete(`/delete/${id}`);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 };

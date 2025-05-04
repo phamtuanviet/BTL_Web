@@ -16,6 +16,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Loading from "./Loading";
 const Search = () => {
   const [tripType, setTripType] = useState("oneway");
   const [leavingFrom, setLeavingFrom] = useState("");
@@ -26,6 +27,7 @@ const Search = () => {
   const [airportSuggestions, setAirportSuggestions] = useState([]);
   const [isRotated, setIsRotated] = useState(true);
   const [passenger, setPassenger] = useState([1, 0, 0]);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const leavingButtonRef = useRef(null);
   const leavingContentRef = useRef(null);
@@ -170,11 +172,12 @@ const Search = () => {
   };
 
   const handleSearch = () => {
-    if (tripType === "oneway" && (!leavingFrom || !goingTo)) {
+    if (!leavingFrom || !goingTo) {
       toast.error("Please fill all fields");
     } else if (leavingFrom === goingTo) {
       toast.error("Departure airport and arrivial airport must be difference");
     } else {
+      setIsLoading(true);
       const data = {
         tripType,
         departureAirport: leavingFrom,
@@ -185,10 +188,10 @@ const Search = () => {
         children: passenger[1],
         infants: passenger[2],
       };
-      console.log(data);
       const payload = encodeURIComponent(JSON.stringify(data));
       const href = `/search-flight?payload=${payload}`;
       router.push(href);
+      setIsLoading(false);
     }
   };
 
@@ -634,6 +637,7 @@ const Search = () => {
           </div>
         </div>
       </div>
+      {isLoading && <Loading />}
     </div>
   );
 };

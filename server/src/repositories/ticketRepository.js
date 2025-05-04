@@ -121,10 +121,14 @@ export const getTicketsBySearch = async (
             },
           },
           {
-            passengerName: { contains: query, mode: "insensitive" },
-          },
-          {
-            passengerEmail: { contains: query, mode: "insensitive" },
+            passenger: {
+              is: {
+                OR: [
+                  { fullName: { contains: query, mode: "insensitive" } },
+                  { email: { contains: query, mode: "insensitive" } },
+                ],
+              },
+            },
           },
           {
             seatNumber: { contains: query, mode: "insensitive" },
@@ -153,6 +157,18 @@ export const getTicketsBySearch = async (
     orderByOption = {
       [sortBy]: {
         seatClass: sortOrder.toLowerCase() === "desc" ? "desc" : "asc",
+      },
+    };
+  } else if (sortBy === "passengerName") {
+    orderByOption = {
+      ["passenger"]: {
+        fullName: sortOrder.toLowerCase() === "desc" ? "desc" : "asc",
+      },
+    };
+  } else if (sortBy === "passengerEmail") {
+    orderByOption = {
+      ["passenger"]: {
+        email: sortOrder.toLowerCase() === "desc" ? "desc" : "asc",
       },
     };
   } else {
@@ -185,6 +201,7 @@ export const getTicketsBySearch = async (
           },
         },
       },
+      passenger: {},
       flightSeat: {},
       bookedBy: {
         select: {
@@ -260,6 +277,7 @@ export const filterTickets = async (query) => {
     passengerType,
     passengerName,
     passengerEmail,
+    isCancelled,
   } = query;
 
   const page = parseInt(query.page) || 1;
@@ -273,9 +291,16 @@ export const filterTickets = async (query) => {
     where.flightSeat = { is: { seatClass: { equals: seatClass } } };
   if (passengerType) where.passengerType = { equals: passengerType };
   if (passengerName)
-    where.passengerName = { contains: passengerName, mode: "insensitive" };
+    where.passenger = {
+      is: { fullName: { contains: passengerName, mode: "insensitive" } },
+    };
   if (passengerEmail)
-    where.passengerEmail = { contains: passengerEmail, mode: "insensitive" };
+    where.passenger = {
+      is: { email: { contains: passengerName, mode: "insensitive" } },
+    };
+  if (isCancelled !== undefined) {
+    where.isCancelled = { equals: Boolean(isCancelled) };
+  }
 
   if (Object.keys(where).length === 0) {
     throw new Error("At least one filter param is required");
@@ -305,6 +330,7 @@ export const filterTickets = async (query) => {
         },
       },
       flightSeat: {},
+      passenger: {},
       bookedBy: {
         select: {
           id: true,

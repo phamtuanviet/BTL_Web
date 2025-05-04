@@ -36,7 +36,7 @@ const Page = () => {
     if (res.success) {
       setCheck(true);
       router.push("/");
-      toast.success("Register ticket successfully");
+      toast.success("Register ticket successfully,please check your email to recive info ticket");
     }
   };
 
@@ -52,6 +52,7 @@ const Page = () => {
           onSubmit={handleSubmit}
           className="w-full h-full fixed flex flex-col justify-center text-center items-center px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 mb-[2rem]"
         >
+          <div className="font-semibold text-2xl">OTP will be sent your email please check email to confirm</div>
           <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl flex flex-col gap-3">
             <p className="font-semibold text-2xl">OTP Authentication</p>
             <div className="w-full">

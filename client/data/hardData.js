@@ -1,37 +1,37 @@
 export const slides = [
   {
     id: 0,
-    image: "/images/slide0.jpg",
+    image: "/images/tokyo.jpg",
     destination: "Tokyo",
     content: "Discover Tokyo, a modern city blending tradition and technology.",
   },
   {
     id: 1,
-    image: "/images/slide1.jpg",
+    image: "/images/paris.jpg",
     destination: "Paris",
     content: "Paris – The city of love, art, and historic architecture.",
   },
   {
     id: 2,
-    image: "/images/slide2.jpg",
+    image: "/images/newyork.jpg",
     destination: "NewYork",
     content: "New York – The city that never sleeps, full of vibrant culture.",
   },
   {
     id: 3,
-    image: "/images/slide3.jpg",
+    image: "/images/beijing.jpg",
     destination: "Beijing",
     content: "Beijing – A city with a rich history and unique Chinese culture.",
   },
   {
     id: 4,
-    image: "/images/slide4.jpg",
+    image: "/images/shanghai.jpg",
     destination: "ShangHai",
     content: "Shanghai – A dynamic city where East meets West.",
   },
   {
     id: 5,
-    image: "/images/slide5.jpg",
+    image: "/images/dubai.jpg",
     destination: "DuBai",
     content:
       "Dubai – A luxurious paradise in the desert with world-class architecture.",
@@ -216,6 +216,7 @@ export const columnTickets = [
   {
     header: "Passenger Name",
     accessor: "passengerName",
+    className: "hidden lg:table-cell",
   },
   {
     header: "Departure Airport",
@@ -248,6 +249,10 @@ export const columnTickets = [
     header: "Booking Reference",
     accessor: "bookingReference",
     className: "table-cell sm:hidden",
+  },
+  {
+    header: "Cancel",
+    accessor: "isCancelled",
   },
   {
     header: "Actions",
@@ -477,7 +482,7 @@ export const createNewsFormFields = [
     name: "thumbnail",
     type: "file",
     editable: true,
-    required: true,
+    required: false,
   },
   {
     label: "Created At",
@@ -503,7 +508,7 @@ export const createFlightsFormFields = [
     type: "text",
     required: false,
     editable: true,
-    placeholder : "Fill or not (Auto generated)"
+    placeholder: "Fill or not (Auto generated)",
   },
   {
     name: "departureAirport",
@@ -641,7 +646,7 @@ export const filterUsersFormFields = [
     label: "Role",
     name: "role",
     type: "select",
-    defaultValue : "ADMIN",
+    defaultValue: "ADMIN",
     options: [
       { label: "Admin", value: "ADMIN" },
       { label: "User", value: "USER" },
@@ -651,7 +656,7 @@ export const filterUsersFormFields = [
     label: "Account Verified",
     name: "isAccountVerified",
     type: "select",
-    defaultValue : true,
+    defaultValue: true,
     options: [
       { label: "Yes", value: true },
       { label: "No", value: false },
@@ -675,7 +680,7 @@ export const filterNewsFormFields = [
     label: "Public",
     name: "isPublished",
     type: "select",
-    defaultValue : true,
+    defaultValue: true,
     options: [
       { label: "Yes", value: true },
       { label: "No", value: false },
@@ -778,6 +783,16 @@ export const filterTicketsFormFields = [
     name: "passengerEmail",
     label: "Passenger Email",
     type: "email",
+  },
+  {
+    name: "isCancelled",
+    label: "Cancel",
+    type: "select",
+    defaultValue: true,
+    options: [
+      { label: "Yes", value: true },
+      { label: "No", value: false },
+    ],
   },
 ];
 
@@ -905,5 +920,9 @@ export const sortTicketFormFields = [
   {
     label: "Booking Reference",
     value: "bookingReference",
+  },
+  {
+    label: "Cancel",
+    value: "isCancelled",
   },
 ];

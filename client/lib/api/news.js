@@ -10,7 +10,7 @@ const newsApi = axios.create({
 newsApi.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    return Promise.reject(error.response?.data.message || error.message);
+    return Promise.reject(error);
   }
 );
 
@@ -19,7 +19,8 @@ const newsService = {
     try {
       return await newsApi.get("/");
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -32,7 +33,8 @@ const newsService = {
         },
       });
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -49,7 +51,8 @@ const newsService = {
       });
       return data;
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -57,7 +60,8 @@ const newsService = {
     try {
       return await newsApi.get(`/${id}`);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -65,7 +69,8 @@ const newsService = {
     try {
       return await newsApi.post("/", newsData);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -73,7 +78,8 @@ const newsService = {
     try {
       return await newsApi.put(`/${id}`, updateData);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -85,7 +91,8 @@ const newsService = {
         params: filterData,
       });
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -95,12 +102,7 @@ const newsService = {
       toast.success("delete success");
       return data;
     } catch (error) {
-      const msg =
-        error?.response?.data?.message ||
-        error.message ||
-        error ||
-        "An error occurred";
-      toast.error(msg);
+      toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
     }
   },

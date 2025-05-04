@@ -10,7 +10,7 @@ const flightApi = axios.create({
 flightApi.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    return Promise.reject(error.response?.data.message || error.message);
+    return Promise.reject(error);
   }
 );
 
@@ -19,7 +19,8 @@ const flightService = {
     try {
       return await flightApi.get("/");
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -32,7 +33,8 @@ const flightService = {
         },
       });
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
   searchFlightsInTicket: async (searchTerm, { signal } = {}) => {
@@ -41,7 +43,9 @@ const flightService = {
         signal,
       });
     } catch (error) {
-      throw error;
+      if (error.message === "canceled") return;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -60,7 +64,8 @@ const flightService = {
       });
       return data;
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -68,7 +73,8 @@ const flightService = {
     try {
       return await flightApi.get(`/${id}`);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -80,10 +86,10 @@ const flightService = {
         params: filterData,
       });
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
-
 
   searchFlightsByUser: async (searchData) => {
     try {
@@ -91,15 +97,17 @@ const flightService = {
         params: searchData,
       });
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
-  
+
   createFlight: async (flightData) => {
     try {
       return await flightApi.post("/", flightData);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -107,7 +115,8 @@ const flightService = {
     try {
       return await flightApi.put(`/${id}`, updateData);
     } catch (error) {
-      throw error;
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
     }
   },
 
@@ -117,12 +126,7 @@ const flightService = {
       toast.success("delete success");
       return data;
     } catch (error) {
-      const msg =
-        error?.response?.data?.message ||
-        error.message ||
-        error ||
-        "An error occurred";
-      toast.error(msg);
+      toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
     }
   },
