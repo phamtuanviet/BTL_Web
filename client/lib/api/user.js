@@ -28,9 +28,9 @@ const userService = {
     }
   },
 
-  getuserById: async (id) => {
+  getUserById: async (id) => {
     try {
-      return await userApi.get(`/get/${id}`);
+      return await userApi.get(`/${id}`);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;

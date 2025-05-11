@@ -3,13 +3,8 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 
-const Ticket = ({ data, handleCancel }) => {
+const TicketDes = ({ data }) => {
   const [isDetail, setIsDetail] = useState(false);
-  const [cancelCode, setCancelCode] = useState("");
-  const cancelTicket = async () => {
-    const res = await ticketService.cancelTicket({ id: data.id, cancelCode });
-    if (res) handleCancel();
-  };
   return (
     <div
       className="w-full flex flex-col justify-center text-center 
@@ -100,52 +95,39 @@ const Ticket = ({ data, handleCancel }) => {
         </div>
         {isDetail && (
           <div className="flex flex-row justify-between items-center text-start">
-            {data.flight.seats.map((seat) => (
-              <div key={seat.seatClass} className="flex flex-col gap-3">
-                <p className="font-light text-xl">
-                  Seat Class:{" "}
-                  <span className="font-bold text-[1.5xl]">
-                    {`${seat.seatClass}`}
-                  </span>
-                </p>
-                <p className="font-light text-xl">
-                  Total seats:{" "}
-                  <span className="font-bold text-[1.5xl]">
-                    {`${seat.totalSeats}`}
-                  </span>
-                </p>
-                <p className="font-light text-xl">
-                  Booked seats:{" "}
-                  <span className="font-bold text-[1.5xl]">
-                    {`${seat.bookedSeats}`}
-                  </span>
-                </p>
-              </div>
-            ))}
+            <div className="flex flex-col gap-3">
+              <p className="font-light text-xl">
+                Cancel code:{" "}
+                <span className="font-bold text-[1.5xl]">
+                  {`${data.cancelCode}`}
+                </span>
+              </p>
+              <p className="font-light text-xl">
+                Passenger Type:{" "}
+                <span className="font-bold text-[1.5xl]">
+                  {`${data.passengerType}`}
+                </span>
+              </p>
+            </div>
+            <div className="flex flex-col gap-3">
+              <p className="font-light text-xl">
+                Total Seats:{" "}
+                <span className="font-bold text-[1.5xl]">
+                  {`${data.flightSeat.totalSeats}`}
+                </span>
+              </p>
+              <p className="font-light text-xl">
+                Price:{" "}
+                <span className="font-bold text-[1.5xl]">
+                  {`${data.flightSeat.price}`}
+                </span>
+              </p>
+            </div>
           </div>
         )}
-
-        <div className="flex flex-row justify-start py-2 gap-3 items-center">
-          <div className="w-[25rem]">
-            <input
-              name="cancelCode"
-              type="text"
-              value={cancelCode}
-              onChange={(e) => setCancelCode(e.target.value)}
-              className="mt-1 w-full border rounded px-3 py-3 "
-              placeholder={`Type CancelCode to cancel ticket`}
-            />
-          </div>
-          <button
-            className="text-white bg-red-300 hover:bg-red-500 p-3 rounded-2xl font-medium"
-            onClick={cancelTicket}
-          >
-            Cancel Ticket
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
-export default Ticket;
+export default TicketDes;

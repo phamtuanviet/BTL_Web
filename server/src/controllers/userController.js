@@ -2,15 +2,15 @@ import * as userRepository from "../repositories/userRepository.js";
 
 export const getUserData = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { id } = req.params;
 
-    if (!userId) {
+    if (!id) {
       return res
         .status(400)
         .json({ success: false, message: "Missing userId" });
     }
 
-    const user = await userRepository.findUserById(userId);
+    const user = await userRepository.getUserByAdmin(id);
 
     if (!user) {
       return res
@@ -21,11 +21,7 @@ export const getUserData = async (req, res) => {
     return res.json({
       success: true,
       userData: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        isAccountVerified: user.isAccountVerified,
+        ...user,
       },
     });
   } catch (error) {
@@ -56,7 +52,13 @@ export const getUsersBySearch = async (req, res) => {
     const sortOrder = req.query.sortOrder || "asc";
 
     const { users, totalPages, currentPage } =
-      await userRepository.getUsersBySearch(page, pageSize, query,sortBy,sortOrder);
+      await userRepository.getUsersBySearch(
+        page,
+        pageSize,
+        query,
+        sortBy,
+        sortOrder
+      );
 
     return res.json({
       success: true,
@@ -77,11 +79,11 @@ export const filterUsers = async (req, res) => {
     const users = await userRepository.filterUsers(req.query);
     res.status(200).json({ success: true, data: users });
   } catch (err) {
-    if (err.message.includes('At least one')) {
+    if (err.message.includes("At least one")) {
       return res.status(400).json({ success: false, error: err.message });
     }
     console.error(err);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 

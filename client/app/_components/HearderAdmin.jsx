@@ -15,7 +15,6 @@ import Sidebar from "../_components/Sidebar";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-
 const HearderAdmin = () => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -26,10 +25,10 @@ const HearderAdmin = () => {
   };
   return (
     <>
-      <div className="absolute block md:hidden h-screen z-10">
+      <div className="fixed block md:hidden h-screen z-[21]">
         <Sidebar type="small" />
       </div>
-      <div className="flex justify-end sticky w-full md:hidden border-b-2 border-b-gray-300 z-0 py-2 pr-3 items-center shadow-md">
+      <div className="flex justify-end sticky top-0 w-full md:hidden border-b-2 border-b-gray-300 bg-white z-[20] py-2 pr-3 items-center shadow-md">
         <div className="flex gap-2 items-center ">
           <DropdownMenu>
             <DropdownMenuTrigger>

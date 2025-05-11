@@ -6,7 +6,7 @@ import {
   updateBookedSeat,
   updateFlightSeat,
 } from "./flightSeatRepository.js";
-import { getFlightByFlightNumber, getFlightById } from "./flightRepository.js";
+import { getFlightByFlightNumber } from "./flightRepository.js";
 import { generateBookingReference } from "../services/other.js";
 const prisma = new PrismaClient();
 
@@ -31,9 +31,29 @@ export const getAllTicketsFromFlight = async (flightId) => {
 };
 
 export const getTicketById = async (id) => {
-  return await prisma.ticket.findUnique({
-    where: { id },
+  const ticket = await prisma.ticket.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      flight: {
+        include: {
+          departureAirport: true,
+          arrivalAirport: true,
+        },
+      },
+      bookedBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      flightSeat: true,
+      passenger: true,
+    },
   });
+  return ticket;
 };
 
 export const createTicket = async (data) => {

@@ -168,9 +168,11 @@ export const handleTicketClientRequest = async (req, res) => {
     console.log(req.body);
 
     let userEmail = null;
-    const { token } = req.cookies;
-    const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
-    userEmail = tokenDecode.email;
+    if (req?.cookies?.token) {
+      const { token } = req.cookies;
+      const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
+      userEmail = tokenDecode.email;
+    }
 
     const effectiveEmail = userEmail || guestEmail;
     if (!effectiveEmail)

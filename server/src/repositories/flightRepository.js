@@ -28,9 +28,17 @@ export const getAllFlights = async () => {
 };
 
 export const getFlightById = async (id) => {
-  return await prisma.flight.findUnique({
+  const flight = await prisma.flight.findUnique({
     where: { id },
+    include: {
+      departureAirport: true,
+      arrivalAirport: true,
+      aircraft: true,
+      seats: true,
+    },
   });
+  const sanitizedFlight = sanitize(flight);
+  return sanitizedFlight;
 };
 
 export const getFlightByFlightNumber = async (flightNumber) => {

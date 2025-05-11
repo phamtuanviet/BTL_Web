@@ -16,9 +16,36 @@ export const getAllAircrafts = async () => {
 };
 
 export const getAircraftById = async (id) => {
-  return await prisma.aircraft.findUnique({
+  const aircraft = await prisma.aircraft.findUnique({
     where: { id },
+    include: {
+      flights: {
+        select: {
+          id: true,
+          flightNumber: true,
+          departureTime: true,
+          arrivalTime: true,
+          estimatedArrival: true,
+          estimatedDeparture: true,
+          status: true,
+          departureAirport: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          arrivalAirport: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+    },
   });
+  const sanitizedAircraft = sanitizeAircraft(aircraft);
+  return sanitizedAircraft;
 };
 
 export const getAircraftByName = async (name) => {
@@ -135,7 +162,7 @@ export const filterAircrafts = async (query) => {
     skip,
     take: pageSize,
   });
-  console.log(aircrafts)
+  console.log(aircrafts);
 
   const sanitizedAircrafts = Array.isArray(aircrafts)
     ? aircrafts.map(sanitizeAircraft)

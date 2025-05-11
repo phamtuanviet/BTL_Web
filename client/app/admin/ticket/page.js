@@ -44,7 +44,9 @@ const page = () => {
       <td className="font-sans hidden lg:table-cell">
         {item.flight.flightNumber}
       </td>
-      <td className="font-sans hidden lg:table-cell">{item.passenger.fullName}</td>
+      <td className="font-sans hidden lg:table-cell">
+        {item.passenger.fullName}
+      </td>
       <td className="font-sans">{item.flight.departureAirport.name}</td>
       <td className="font-sans">{item.flight.arrivalAirport.name}</td>
 
@@ -61,12 +63,10 @@ const page = () => {
       <td className="font-sans hidden lg:table-cell">
         {item.flightSeat.seatClass}
       </td>
-      <td>
-        {item.isCancelled ? "Yes" : "No"}
-      </td>
+      <td>{item.isCancelled ? "Yes" : "No"}</td>
       <td>
         <div className="flex items-center gap-1">
-          <Link href={`/admin/news/${item.id}`}>
+          <Link href={`/admin/ticket/${item.id}`}>
             <button className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-200 cursor-pointer">
               <Eye className="w-[16px] h-[16px] text-white" />
             </button>

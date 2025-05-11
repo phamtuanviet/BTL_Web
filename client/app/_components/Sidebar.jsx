@@ -36,7 +36,7 @@ const Sidebar = ({ type }) => {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={`${
               type === "big" ? "hidden md:block" : "block"
-            } h-full z-10`}
+            } h-full z-10 fixed`}
           >
             <div className="py-5 bg-gray-100 w-[17rem] rounded-r-3xl shadow-md pr-4 h-full">
               <div className="flex justify-between items-center">
@@ -70,7 +70,7 @@ const Sidebar = ({ type }) => {
           transition={{ delay: 0.3 }}
           className={` py-5 pl-3 z-10 ${
             type === "big" ? "hidden md:block" : "block"
-          }`}
+          } fixed`}
         >
           <AlignJustify
             className="cursor-pointer"

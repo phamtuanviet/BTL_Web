@@ -64,9 +64,10 @@ const FilterModal = ({
     const ctrl = new AbortController();
     abortControllers.current[fieldName] = ctrl;
     try {
-      const { data } = await searchFn(value, {
+      const res = await searchFn(value, {
         signal: ctrl?.signal || undefined,
       });
+      const data = res?.data || [];
       setSuggestions((s) => ({ ...s, [fieldName]: data }));
     } catch (err) {
       if (

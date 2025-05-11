@@ -74,7 +74,7 @@ const page = () => {
       <td className="hidden lg:table-cell font-sans">{item.bookedSeats}</td>
       <td>
         <div className="flex items-center gap-1">
-          <Link href={`/admin/user/${item.id}`}>
+          <Link href={`/admin/flight/${item.id}`}>
             <button className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-200 cursor-pointer">
               <Eye className="w-[16px] h-[16px] text-white" />
             </button>

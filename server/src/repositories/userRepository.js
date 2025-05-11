@@ -15,6 +15,10 @@ export const getAllUsers = async () => {
   return await prisma.user.findMany();
 };
 
+export const getTotalUsers = async () => {
+  return await prisma.user.findMany();
+};
+
 export const getUsersBySearch = async (
   page = 1,
   pageSize = 10,
@@ -95,20 +99,20 @@ export const filterUsers = async (query) => {
   const where = {};
   Object.entries(query).forEach(([key, val]) => {
     if (val == null || val === "" || !operatorMap[key]) return;
-  
+
     let parsed = val;
     if (key === "isAccountVerified") {
       parsed = val === "true";
     }
-  
+
     if (operatorMap[key] === "contains") {
       where[key] = {
         contains: parsed,
-        mode: "insensitive"
+        mode: "insensitive",
       };
     } else {
       where[key] = {
-        [operatorMap[key]]: parsed
+        [operatorMap[key]]: parsed,
       };
     }
   });
@@ -132,4 +136,31 @@ export const filterUsers = async (query) => {
     totalPages: Math.ceil(totalUsers / pageSize),
     currentPage: page,
   };
+};
+
+export const getUserByAdmin = async (id) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      isAccountVerified: true,
+      role: true,
+      tickets: {
+        include: {
+          flightSeat: {
+            select: {
+              seatClass: true,
+              price: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  const sanitizedUser = sanitizeUser(user);
+  return sanitizedUser;
 };
