@@ -106,6 +106,15 @@ const newsService = {
       return null;
     }
   },
+
+  countNews: async () => {
+    try {
+      return await newsApi.get("/count-news");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
+    }
+  },
 };
 
 export default newsService;

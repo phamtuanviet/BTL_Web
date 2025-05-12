@@ -72,6 +72,19 @@ export const getUsersBySearch = async (req, res) => {
   }
 };
 
+export const countUsers = async (req, res) => {
+  try {
+    const count = await userRepository.countUsers();
+    return res.json({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    console.error("Error in countUsers:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export const filterUsers = async (req, res) => {
   try {
     const users = await userRepository.filterUsers(req.query);

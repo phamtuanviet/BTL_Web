@@ -149,3 +149,8 @@ export const filterAircrafts = async (query) => {
     currentPage: page,
   };
 };
+
+export const countAircrafts = async () => {
+  const count = await prisma.aircraft.count();
+  return count;
+};

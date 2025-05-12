@@ -29,7 +29,7 @@ const HearderAdmin = () => {
       <div className="absolute block md:hidden h-screen z-10">
         <Sidebar type="small" />
       </div>
-      <div className="flex justify-end sticky w-full md:hidden border-b-2 border-b-gray-300 z-0 py-2 pr-3 items-center shadow-md">
+      <div className="flex justify-end sticky w-full border-b-2 border-b-gray-300 z-0 py-2 pr-3 items-center shadow-md mb-3">
         <div className="flex gap-2 items-center ">
           <DropdownMenu>
             <DropdownMenuTrigger>

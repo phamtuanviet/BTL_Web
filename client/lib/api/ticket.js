@@ -139,6 +139,36 @@ const ticketService = {
       return null;
     }
   },
+
+  countAllTicket: async () => {
+    try {
+      const res = await ticketApi.get("/count-all-ticket");
+      return res;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
+    }
+  },
+
+  countCancelledTicket: async () => {
+    try {
+      const res = await ticketApi.get("/count-cancelled-ticket");
+      return res;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
+    }
+  },
+
+  countTicketStats: async (status) => {
+    try {
+      const res = await ticketApi.get("count-ticket-stats");
+      return res;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
+    }
+  },
 };
 
 export default ticketService;

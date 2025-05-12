@@ -121,6 +121,15 @@ const aircraftService = {
       return null;
     }
   },
+
+  countAircrafts: async () => {
+    try {
+      return await aircraftApi.get("/count-aircrafts");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
+    }
+  }
 };
 
 export default aircraftService;

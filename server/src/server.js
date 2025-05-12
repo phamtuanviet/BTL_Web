@@ -6,11 +6,12 @@ import { authRouter } from "./routes/authRoute.js";
 import userRouter from "./routes/useRoute.js";
 import { airportRoute } from "./routes/airportRoute.js";
 import { newsRoute } from "./routes/newsRoute.js";
-import { aircraftRoute } from "./routes/aircarftRoute.js";
+import { aircraftRoute } from "./routes/aircraftRoute.js";
 import { flightRoute } from "./routes/flightRoute.js";
 import { startFlightStatusCron } from "./services/flightStatusCron.js";
 import { flightSeatRoute } from "./routes/flightSeatRoute.js";
 import { ticketRoute } from "./routes/ticketRoute.js";
+import { revenueRoute } from "./routes/revenueRoute.js";
 
 
 
@@ -39,6 +40,7 @@ app.use("/api/aircraft",aircraftRoute)
 app.use("/api/flight",flightRoute)
 app.use("/api/flight-seat",flightSeatRoute)
 app.use("/api/ticket",ticketRoute)
+app.use("/api/revenue", revenueRoute)
 
 app.listen(port, () => {
   console.log(`Server is running in port ${port}`);

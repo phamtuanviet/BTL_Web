@@ -55,6 +55,12 @@ export const getAllNews = async () => {
   });
 };
 
+
+export const countNews = async () => {
+  const count = await prisma.news.count();
+  return count;
+};
+
 export const createNews = async (
   title,
   content,
