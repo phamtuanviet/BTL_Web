@@ -62,11 +62,13 @@ export default function ForgetPasswordForm() {
   const onSubmit = async (values) => {
     try {
       if (type !== "new-password") {
-        dispatch(sendResetOtp(values));
+        await dispatch(sendResetOtp(values)).unwrap();
         router.push(`/auth/verify?type=reset&email=${values.email}`);
       } else {
-        console.log(values.password)
-        dispatch(resetPassword({ newPassword: values.password }));
+        console.log(values.password);
+        await dispatch(
+          resetPassword({ newPassword: values.password })
+        ).unwrap();
         router.push("/");
       }
     } catch (error) {

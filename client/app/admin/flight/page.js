@@ -35,6 +35,7 @@ import aircraftService from "@/lib/api/aircraft";
 import flightService from "@/lib/api/flight";
 import CreateFlight from "@/app/_components/CreateFlight";
 import airportService from "@/lib/api/airport";
+import { toast } from "sonner";
 const page = () => {
   const [flights, setFlights] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -153,12 +154,18 @@ const page = () => {
   };
 
   const submitUpdate = async (updatedValues) => {
+    if (updatedValues.departureTime >= updatedValues.arrivalTime) {
+      return toast.error("Invalid time");
+    }
     await flightService.updateFlight(updatedValues.id, updatedValues);
     fetchData(currentPage, 10, query, sortBy, sortOrder);
     closeModal();
   };
 
   const submitCreate = async (createdValues) => {
+    if (createdValues.departureTime >= createdValues.arrivalTime) {
+      return toast.error("Invalid time");
+    }
     await flightService.createFlight(createdValues);
     fetchData(currentPage, 10, query, sortBy, sortOrder);
     closeCreateModal();

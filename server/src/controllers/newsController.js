@@ -21,6 +21,19 @@ export const getAllNews = async (req, res) => {
   }
 };
 
+export const countNews = async (req, res) => {
+  try {
+    const count = await newsRepository.countNews();
+    return res.json({
+        success: true,
+        count,
+      });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 export const getLatestNews = async (req, res) => {
   try {
     const skip = parseInt(req.query.skip) || 0;

@@ -5,6 +5,9 @@ export const aircraftRoute = express.Router()
 
 aircraftRoute.get("/get-aircrafts-by-search",aircraftController.getAircraftsBySearch)
 aircraftRoute.get("/get-all-aircrafts", aircraftController.getAircrafts);
+
+aircraftRoute.get("/count-aircrafts", aircraftController.countAircrafts);
+
 aircraftRoute.get("/filter", aircraftController.filterAircrafts);
 aircraftRoute.get("/search-aircrafts-in-flight/:q", aircraftController.searchAircraftsInFlight);
 aircraftRoute.get("/:id", aircraftController.getAircraft);

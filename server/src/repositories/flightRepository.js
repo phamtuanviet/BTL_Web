@@ -552,3 +552,34 @@ export const searchFlightsForUser = async (params) => {
 
   return { outbound };
 };
+
+export const countFlights = async () => {
+  return await prisma.flight.count();
+};
+
+export const countStatus = async () => {
+  const statusCounts = await prisma.flight.groupBy({
+    by: ["status"],
+    _count: {
+      id: true,
+    },
+  });
+
+  // Danh sách tất cả trạng thái có trong enum
+  const ALL_STATUSES = ["Scheduled", "Delayed", "Departed", "Arrived", "Cancelled"];
+
+  // Chuyển kết quả groupBy thành map để tra nhanh
+  const resultMap = Object.fromEntries(
+    statusCounts.map((item) => [capitalize(item.status), item._count.id])
+  );
+
+  // Trả về đủ 5 trạng thái, nếu không có thì count = 0
+  return ALL_STATUSES.map((status) => ({
+    status,
+    count: resultMap[status] || 0,
+  }));
+};
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}

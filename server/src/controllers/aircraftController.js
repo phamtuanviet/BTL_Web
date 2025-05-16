@@ -127,3 +127,16 @@ export const filterAircrafts = async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+export const countAircrafts = async (req, res) => {
+  try {
+    const count = await aircraftRepository.countAircrafts();
+    return res.json({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    console.error("Error in countAircrafts:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

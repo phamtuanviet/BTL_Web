@@ -156,7 +156,9 @@ export default function Page() {
               </div>
               <p className="text-lg">Show filters</p>
             </button>
-            {timeRange && <p className="text-center font-medium text-xl text-primary flex items-center">{`${disPlayTextFilter()}`}</p>}
+            {timeRange && (
+              <p className="text-center font-medium text-xl text-primary flex items-center">{`${disPlayTextFilter()}`}</p>
+            )}
           </div>
         )}
 
@@ -350,14 +352,16 @@ export default function Page() {
                       ) : (
                         <p>No seats available in this class.</p>
                       )}
-                      <button
-                        className="flex flex-row p-3 bg-primary gap-2 rounded-2xl text-white cursor-pointer"
-                        onClick={() => handleBooked(openDetail.seatClass)}
-                      >
-                        <p className="text-lg font-semibold">
-                          Confirm And Continue
-                        </p>
-                      </button>
+                      {openDetail.seatData && (
+                        <button
+                          className="flex flex-row p-3 bg-primary gap-2 rounded-2xl text-white cursor-pointer"
+                          onClick={() => handleBooked(openDetail.seatClass)}
+                        >
+                          <p className="text-lg font-semibold">
+                            Confirm And Continue
+                          </p>
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

@@ -321,3 +321,30 @@ export const lookUpTicket = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const countAllTicket = async (req, res) => {
+  try {
+    const count = await ticketRepository.countAllTicket();
+    return res.status(200).json({ success: true, data: count });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const countCancelledTicket = async (req, res) => {
+  try {
+    const count = await ticketRepository.countCancelledTicket();
+    return res.status(200).json({ success: true, data: count });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const countTicketStats = async (req, res) => {
+  try {
+    const count = await ticketRepository.countTicketStats();
+    return res.status(200).json({ success: true, data: count });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

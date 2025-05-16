@@ -1,7 +1,7 @@
 "use client"
 
 import { AlignJustify } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Menu from "../_components/Menu";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,9 +21,22 @@ const Sidebar = ({ type }) => {
     }
     return false;
   });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setVisible(window.innerWidth < 1024);
+    }
+    
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    }
+  }, []);
+
   const handleBackClient = () => {
     router.push("/");
   }
+
   return (
     <>
       <AnimatePresence>

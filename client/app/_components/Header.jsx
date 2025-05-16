@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import store from "@/redux/store";
 import { LogOut, UserRoundPen } from "lucide-react";
 import { logoutUser } from "@/redux/features/authSlice";
+import Swal from "sweetalert2";
 
 // QAirline
 const Header = () => {
@@ -38,8 +39,23 @@ const Header = () => {
     router.push("/auth/forget-password?type=new-password");
   };
   const handleLogout = () => {
-    dispatch(logoutUser());
-    localStorage.removeItem("persist:root.auth");
+    Swal.fire({
+      title: "Are you sure you want to logout?",
+      text: "You will have to log in again!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Logout",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(logoutUser());
+        localStorage.removeItem("persist:root.auth");
+        router.push("/");
+        console.log("Đã logout");
+      }
+    });
   };
 
   return (
@@ -67,13 +83,15 @@ const Header = () => {
               Look Up
             </li>
           </Link>
-          {user && user?.isAccountVerified && <Link href={"/your-flight"}>
-            <li
-              className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer`}
-            >
-              Your Flight
-            </li>
-          </Link>}
+          {user && user?.isAccountVerified && (
+            <Link href={"/your-flight"}>
+              <li
+                className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer`}
+              >
+                Your Flight
+              </li>
+            </Link>
+          )}
           <Link href={"/news"}>
             <li
               className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer`}

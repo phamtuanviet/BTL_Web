@@ -40,7 +40,7 @@ const CreateModal = ({
       const result = await searchFn(value, {
         signal: ctrl?.signal || undefined,
       });
-      console.log(result)
+
       if (!result) {
         return;
       }

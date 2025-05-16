@@ -68,6 +68,15 @@ const userService = {
     }
   },
 
+  countUsers: async () => {
+    try {
+      return await userApi.get("/count-users");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
+    }
+  },
+
   searchUsers: async (searchTerm) => {
     try {
       return await userApi.get(`/search-users/${searchTerm}`);

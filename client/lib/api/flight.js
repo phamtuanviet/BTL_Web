@@ -130,6 +130,24 @@ const flightService = {
       return null;
     }
   },
+
+  countFlights: async () => {
+    try {
+      return await flightApi.get("/count-flights");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
+    }
+  },
+
+  countStatus: async () => {
+    try {
+      return await flightApi.get("/count-status");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+      return null;
+    }
+  },
 };
 
 export default flightService;

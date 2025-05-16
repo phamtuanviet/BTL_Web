@@ -8,6 +8,7 @@ import {
 } from "./flightSeatRepository.js";
 import { getFlightByFlightNumber } from "./flightRepository.js";
 import { generateBookingReference } from "../services/other.js";
+import { startOfDay, subDays, addDays } from "date-fns";
 const prisma = new PrismaClient();
 
 const sanitize = (obj) => {
@@ -489,4 +490,72 @@ export const lookUpTickets = async (search) => {
   });
 
   return tickets;
+};
+
+export const countAllTicket = async () => {
+  const count = await prisma.ticket.count();
+  return count;
+};
+
+export const countCancelledTicket = async () => {
+  const count = await prisma.ticket.count({
+    where: {
+      isCancelled: true,
+    },
+  });
+  return count;
+};
+
+export const countTicketStats = async () => {
+  const today = startOfDay(new Date());
+  console.log(today);
+  const sevenDaysAgo = subDays(today, 6);
+  const tomorrow = addDays(today, 1);
+
+  const tickets = await prisma.ticket.findMany({
+    where: {
+      bookedAt: {
+        gte: sevenDaysAgo,
+        lt: tomorrow,
+      },
+    },
+    select: {
+      bookedAt: true,
+      isCancelled: true,
+    },
+  });
+
+  // Tạo map ngày
+  const statsMap = {};
+  for (let i = 0; i < 7; i++) {
+    const current = addDays(sevenDaysAgo, i);
+    current.setHours(current.getHours() + 7);
+    const date = current.toISOString().slice(0, 10);
+    statsMap[date] = { booked: 0, cancelled: 0 };
+  }
+
+  // Tính toán
+  tickets.forEach((ticket) => {
+    const date = new Date(ticket.bookedAt);
+    date.setHours(date.getHours() + 7);
+    const key = date.toISOString().slice(0, 10);
+    if (statsMap[key]) {
+      if (ticket.isCancelled) statsMap[key].cancelled += 1;
+      else statsMap[key].booked += 1;
+    }
+  });
+
+  // Format trả về: date dạng d/m/yyyy
+  const result = Object.entries(statsMap).map(
+    ([isoDate, { booked, cancelled }]) => {
+      const d = new Date(isoDate);
+      const day = d.getDate();
+      const month = d.getMonth() + 1;
+      const year = d.getFullYear();
+      const formattedDate = `${day}/${month}/${year}`;
+      return { date: formattedDate, booked, cancelled };
+    }
+  );
+
+  return result;
 };

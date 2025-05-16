@@ -154,3 +154,28 @@ export const searchFlightsForUser = async (req, res) => {
   }
 };
 
+export const countFlights = async (req, res) => {
+  try {
+    const count = await flightRepository.countFlights();
+    return res.json({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    console.error("Error in countFlights:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const countStatus = async (req, res) => {
+  try {
+    const count = await flightRepository.countStatus();
+    return res.json({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    console.error("Error in countStatus:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

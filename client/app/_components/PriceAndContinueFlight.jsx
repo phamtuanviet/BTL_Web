@@ -45,7 +45,7 @@ const PriceAndContinueFlight = ({ data }) => {
       totalPriceAdults,
       totalPriceChildren,
     };
-    console.log("hihi")
+
     sessionStorage.setItem("priceFlight", JSON.stringify(priceData));
     router.push("/search-flight/fill-form");
   };
