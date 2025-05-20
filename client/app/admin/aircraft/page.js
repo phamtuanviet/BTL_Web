@@ -181,7 +181,9 @@ const page = () => {
 
   return (
     <div className="h-screen w-full flex">
-      <Sidebar type="big" />
+      <div className="w-64">
+        <Sidebar type="big" />
+      </div>
       <div className="flex-1">
         <HearderAdmin />
         <div className="p-5 flex flex-col items-center justify-between">

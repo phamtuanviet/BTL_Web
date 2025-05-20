@@ -108,7 +108,9 @@ const page = () => {
 
   return (
     <div className="min-h-screen w-full flex">
-      <Sidebar type="big" />
+      <div className="w-64">
+        <Sidebar type="big" />
+      </div>
       <div className="flex-1">
         <HearderAdmin />
 
