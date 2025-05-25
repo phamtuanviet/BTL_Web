@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+// Function to sanitize aircraft data to convert BigInt to string and 
+// avoid JSON serialization issues
 const sanitizeAircraft = (aircraft) => {
   const converted = { ...aircraft };
   for (const key in converted) {
@@ -98,7 +100,7 @@ export const createAircraft = async (data) => {
 };
 
 export const searchAircraftsByName = async (q) => {
-  console.log(q);
+
   return await prisma.aircraft.findMany({
     where: {
       OR: [

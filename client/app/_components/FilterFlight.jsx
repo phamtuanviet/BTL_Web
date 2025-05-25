@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 
+// Variants for framer-motion animations
 const backdropVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
@@ -14,6 +15,7 @@ const modalVariants = {
   exit: { y: 50, opacity: 0 },
 };
 
+// Options for time ranges
 const options = [
   {
     label: "00:00 - 02:59",
@@ -49,6 +51,7 @@ const options = [
   },
 ];
 
+// FilterFlight component for filtering flights used by the admin
 const FilterFlight = ({ onClose, onSubmit }) => {
   const [timeRange, setTimeRange] = useState("");
   const handleSubmit = (e) => {

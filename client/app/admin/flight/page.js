@@ -192,7 +192,7 @@ const page = () => {
 
   return (
     <div className="h-screen w-full flex">
-      <div className="w-64">
+      <div>
         <Sidebar type="big" />
       </div>
       <div className="flex-1">

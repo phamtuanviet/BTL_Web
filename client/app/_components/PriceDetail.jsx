@@ -1,6 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import React from "react";
+
+// Variants for the backdrop and modal animations
 const backdropVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },

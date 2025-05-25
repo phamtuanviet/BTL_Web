@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { toLocalDatetimeString } from "@/services/date";
 
+// Variants for framer-motion animations
 const backdropVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
@@ -32,6 +33,7 @@ const CreateModal = ({
     }, {})
   );
 
+  // Function to handle autocomplete suggestions
   const handleAutocomplete = async (fieldName, value, searchFn) => {
     abortControllers.current[fieldName]?.abort();
     const ctrl = new AbortController();
@@ -58,6 +60,7 @@ const CreateModal = ({
     }
   };
 
+  // Function to handle changes in form fields
   const handleChange = (e) => {
     const { name, type, value, files } = e.target;
     setFormValues((prev) => {

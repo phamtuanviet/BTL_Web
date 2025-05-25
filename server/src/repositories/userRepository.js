@@ -19,6 +19,7 @@ export const getTotalUsers = async () => {
   return await prisma.user.findMany();
 };
 
+// Get users by search with pagination and sorting
 export const getUsersBySearch = async (
   page = 1,
   pageSize = 10,

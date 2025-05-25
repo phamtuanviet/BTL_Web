@@ -3,7 +3,9 @@ import { Armchair, PlaneTakeoff, Timer } from "lucide-react";
 import React from "react";
 import { SeatOption } from "./SeatOption";
 
+// Display flight confirmation details including flight information, seat class, and seat details.
 const ConfirmFlight = ({ dataFlight }) => {
+  // Format seat class to a more readable format to uppercase the first letter of each word and replace underscores with spaces.
   const formatSeatClass = (seatClass) => {
     return seatClass
       .toLowerCase()
@@ -13,6 +15,7 @@ const ConfirmFlight = ({ dataFlight }) => {
   const seat = dataFlight.flight.seats.find(
     (s) => s.seatClass === dataFlight.seatClass
   );
+  // Format date to a more readable format
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {

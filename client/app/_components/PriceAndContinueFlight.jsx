@@ -3,7 +3,11 @@ import React, { useEffect, useState } from "react";
 import PriceDetail from "./PriceDetail";
 import { useRouter } from "next/navigation";
 
+// Display the total price of the flight and allow the user to continue to the next step
+// This component shows the total price of the flight based on selected seats and allows the user to continue to the next step of filling out their information.
 const PriceAndContinueFlight = ({ data }) => {
+  // Extract the outbound and inbound seat information from the selected flight data
+  // and calculate the total price for adults and children.
   const seatOutbound = data.selectedOutbound.flight.seats.find(
     (s) => data.selectedOutbound.seatClass === s.seatClass
   );
@@ -28,6 +32,9 @@ const PriceAndContinueFlight = ({ data }) => {
   useEffect(() => {
     setTotalPirce(totalPriceAdults + totalPriceChildren);
   }, [totalPriceAdults, totalPriceChildren]);
+
+  // Effect to handle body overflow when the detail view is open
+  // This effect sets the body's overflow to hidden when the detail view is open
   useEffect(() => {
     if (isDetail) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";

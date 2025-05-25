@@ -6,6 +6,7 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 
+// Function to sanitize news data to convert BigInt to string and format Date
 const sanitizeNews = (news) => {
   const converted = { ...news };
   for (const key in converted) {

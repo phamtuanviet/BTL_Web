@@ -1,7 +1,9 @@
 import React from "react";
 import { confidentTravels } from "@/data/hardData";
 
+// Part of body component that displays travel support information
 const ConfidentTralvel = () => {
+  // Memoized component to avoid unnecessary re-renders
   const Special = React.memo(({ num, top, content, color }) => (
     <div className="flex flex-col gap-3 items-start">
       <p className={`${color} text-white font-medium px-7 rounded-2xl py-1`}>

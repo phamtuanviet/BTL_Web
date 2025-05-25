@@ -60,6 +60,7 @@ const userService = {
           sortBy,
           sortOrder,
         },
+        withCredentials: true,
       });
       return data;
     } catch (error) {
@@ -70,7 +71,7 @@ const userService = {
 
   countUsers: async () => {
     try {
-      return await userApi.get("/count-users");
+      return await userApi.get("/count-users", { withCredentials: true });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -79,7 +80,9 @@ const userService = {
 
   searchUsers: async (searchTerm) => {
     try {
-      return await userApi.get(`/search-users/${searchTerm}`);
+      return await userApi.get(`/search-users/${searchTerm}`, {
+        withCredentials: true,
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -88,7 +91,7 @@ const userService = {
 
   createNewuser: async (userData) => {
     try {
-      return await userApi.post("/create", userData);
+      return await userApi.post("/create", userData, { withCredentials: true });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -97,7 +100,9 @@ const userService = {
 
   updateUser: async (id, updateData) => {
     try {
-      return await userApi.put(`/update/${id}`, updateData);
+      return await userApi.put(`/update/${id}`, updateData, {
+        withCredentials: true,
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -106,7 +111,7 @@ const userService = {
 
   deleteuser: async (id) => {
     try {
-      return await userApi.delete(`/delete/${id}`);
+      return await userApi.delete(`/delete/${id}`, { withCredentials: true });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;

@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 
+// This component displays ticket details for admin.
 const TicketDes = ({ data }) => {
   const [isDetail, setIsDetail] = useState(false);
   return (

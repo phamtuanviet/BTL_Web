@@ -59,15 +59,97 @@ const Header = () => {
   };
 
   return (
-    <div className="flex p-6 justify-between shadow-sm sticky top-0 w-full z-[999] bg-white px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 mx-auto">
-      <Link href={"/"}>
-        <div className="flex gap-1 items-center cursor-pointer font-bold">
-          <Image alt="logo" width={70} height={70} src={"/images/logo.png"} />
-          <p className="text-[1.5rem] text-primary">QAirLine</p>
+    <div className="flex flex-col w-full">
+      <div className="flex p-6 justify-between shadow-sm sticky top-0 w-full z-[999] bg-white px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 mx-auto">
+        <Link href={"/"}>
+          <div className="flex gap-1 items-center cursor-pointer font-bold">
+            <Image alt="logo" width={70} height={70} src={"/images/logo.png"} />
+            <p className="text-[1.5rem] text-primary">QAirLine</p>
+          </div>
+        </Link>
+        <div className="flex items-center">
+          <ul className="hidden md:flex gap-10 items-center">
+            <Link href={"/"}>
+              <li
+                className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer `}
+              >
+                Home
+              </li>
+            </Link>
+
+            <Link href={"/look-up"}>
+              <li
+                className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer`}
+              >
+                Look Up
+              </li>
+            </Link>
+            {user && user?.isAccountVerified && (
+              <Link href={"/your-flight"}>
+                <li
+                  className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer`}
+                >
+                  Your Flight
+                </li>
+              </Link>
+            )}
+            <Link href={"/news"}>
+              <li
+                className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer`}
+              >
+                News
+              </li>
+            </Link>
+          </ul>
         </div>
-      </Link>
-      <div className="flex items-center">
-        <ul className="hidden md:flex gap-10 items-center">
+        {(!user?.isAccountVerified || !user) && (
+          <div className="flex gap-2 items-center">
+            <Button variant="outline" onClick={handleLogin}>
+              Sign in
+            </Button>
+            <Button variant="outline" onClick={handleRegister}>
+              Sign up
+            </Button>
+          </div>
+        )}
+        {user?.isAccountVerified && (
+          <div className="flex gap-2 items-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Avatar className={"w-[4rem] h-[4rem]"}>
+                  <AvatarImage
+                    src="https://github.com/shadcn.png"
+                    alt="@shadcn"
+                  />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 z-[999]">
+                <DropdownMenuLabel className="font-bold text-1xl">
+                  My Account
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleChangePassword}
+                  className="font-medium text-1xl hover:bg-primary"
+                >
+                  <UserRoundPen />
+                  <span>Change Password</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="font-medium text-1xl hover:bg-primary"
+                >
+                  <LogOut />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+      </div>
+      <div className="flex md:hidden flex-row items-center justify-center shadow-sm p-4">
+        <ul className="gap-5 flex flex-row items-center justify-center">
           <Link href={"/"}>
             <li
               className={`hover:text-primary font-medium text-[1.25rem] cursor-pointer `}
@@ -101,51 +183,6 @@ const Header = () => {
           </Link>
         </ul>
       </div>
-      {(!user?.isAccountVerified || !user) && (
-        <div className="flex gap-2 items-center">
-          <Button variant="outline" onClick={handleLogin}>
-            Sign in
-          </Button>
-          <Button variant="outline" onClick={handleRegister}>
-            Sign up
-          </Button>
-        </div>
-      )}
-      {user?.isAccountVerified && (
-        <div className="flex gap-2 items-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Avatar className={"w-[4rem] h-[4rem]"}>
-                <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@shadcn"
-                />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 z-[999]">
-              <DropdownMenuLabel className="font-bold text-1xl">
-                My Account
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleChangePassword}
-                className="font-medium text-1xl hover:bg-primary"
-              >
-                <UserRoundPen />
-                <span>Change Password</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="font-medium text-1xl hover:bg-primary"
-              >
-                <LogOut />
-                <span>Logout</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      )}
     </div>
   );
 };

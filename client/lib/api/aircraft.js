@@ -22,7 +22,9 @@ aircraftApi.interceptors.response.use(
 const aircraftService = {
   getAllAircrafts: async () => {
     try {
-      return await aircraftApi.get("/get-all-aircrafts");
+      return await aircraftApi.get("/get-all-aircrafts", {
+        withCredentials: true,
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -31,7 +33,7 @@ const aircraftService = {
 
   getAircraftById: async (id) => {
     try {
-      return await aircraftApi.get(`/${id}`);
+      return await aircraftApi.get(`/${id}`, { withCredentials: true });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -40,7 +42,9 @@ const aircraftService = {
 
   searchAircrafts: async (searchTerm) => {
     try {
-      return await aircraftApi.get(`/search-aircrafts/${searchTerm}`);
+      return await aircraftApi.get(`/search-aircrafts/${searchTerm}`, {
+        withCredentials: true,
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -48,11 +52,15 @@ const aircraftService = {
   },
   searchAircraftsInFlight: async (searchTerm, { signal } = {}) => {
     try {
-      return await aircraftApi.get(`/search-aircrafts-in-flight/${searchTerm}`, {
-        signal,
-      });
+      return await aircraftApi.get(
+        `/search-aircrafts-in-flight/${searchTerm}`,
+        {
+          signal,
+          withCredentials: true,
+        }
+      );
     } catch (error) {
-      if(error.message === "canceled") return;
+      if (error.message === "canceled") return;
       toast.error(error?.response?.data?.message || "Something went wrong");
     }
   },
@@ -72,6 +80,7 @@ const aircraftService = {
           sortBy,
           sortOrder,
         },
+        withCredentials: true,
       });
       return data;
     } catch (error) {
@@ -82,10 +91,11 @@ const aircraftService = {
 
   filterAircraft: async (filterData) => {
     try {
-      filterData.page = filterData?.page || 1
-      filterData.pageSize = filterData?.pageSize || 10
+      filterData.page = filterData?.page || 1;
+      filterData.pageSize = filterData?.pageSize || 10;
       return await aircraftApi.get("/filter", {
-        params : filterData
+        params: filterData,
+        withCredentials: true,
       });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
@@ -95,7 +105,9 @@ const aircraftService = {
 
   createNewAircraft: async (aircraftData) => {
     try {
-      return await aircraftApi.post("/", aircraftData);
+      return await aircraftApi.post("/", aircraftData, {
+        withCredentials: true,
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -104,7 +116,9 @@ const aircraftService = {
 
   updateAircraft: async (id, updateData) => {
     try {
-      return await aircraftApi.put(`/${id}`, updateData);
+      return await aircraftApi.put(`/${id}`, updateData, {
+        withCredentials: true,
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -113,7 +127,9 @@ const aircraftService = {
 
   deleteAircraft: async (id) => {
     try {
-      const data = await aircraftApi.delete(`/${id}`);
+      const data = await aircraftApi.delete(`/${id}`, {
+        withCredentials: true,
+      });
       toast.success("Delete success");
       return data;
     } catch (error) {
@@ -124,12 +140,14 @@ const aircraftService = {
 
   countAircrafts: async () => {
     try {
-      return await aircraftApi.get("/count-aircrafts");
+      return await aircraftApi.get("/count-aircrafts", {
+        withCredentials: true,
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
     }
-  }
+  },
 };
 
 export default aircraftService;

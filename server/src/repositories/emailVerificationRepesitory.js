@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
+// Create a new OTP for email verification to buying a ticket
 export async function createOtp(email, otp, ttlSeconds = 1000) {
   return prisma.emailVerification.create({
     data: {
@@ -11,6 +12,7 @@ export async function createOtp(email, otp, ttlSeconds = 1000) {
   });
 }
 
+// To check if an OTP is valid , used in the verification process of buying a ticket
 export async function verifyOtp(email, otp) {
   const record = await prisma.emailVerification.findFirst({
     where: {

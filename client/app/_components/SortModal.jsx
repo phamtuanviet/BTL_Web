@@ -14,6 +14,7 @@ const modalVariants = {
   exit: { y: 50, opacity: 0 },
 };
 
+// SortModal component for sorting items used in admin pages
 const SortModal = ({ onClose, onSubmit, sortFormFields, type,sortBy,sortOrder }) => {
   const [selectSort, setSelectSort] = useState(sortBy);
   const [selectOrder, setSelectOrder] = useState(sortOrder);

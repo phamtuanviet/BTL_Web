@@ -21,8 +21,11 @@ const app = express();
 const port = process.env.PORT || 4000;
 startFlightStatusCron();
 
+// Parse JSON bodies
 app.use(express.json());
+// Parse URL-encoded bodies
 app.use(cookieParser());
+// Cors middleware to allow cross-origin requests
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -42,6 +45,7 @@ app.use("/api/flight-seat",flightSeatRoute)
 app.use("/api/ticket",ticketRoute)
 app.use("/api/revenue", revenueRoute)
 
+// Listen requests on the specified port
 app.listen(port, () => {
   console.log(`Server is running in port ${port}`);
 });

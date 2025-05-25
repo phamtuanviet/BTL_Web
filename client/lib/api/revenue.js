@@ -21,7 +21,7 @@ revenueApi.interceptors.response.use(
 const revenueService = {
   getRevenue: async () => {
     try {
-      return await revenueApi.get('/get-revenue');
+      return await revenueApi.get('/get-revenue',{      withCredentials: true,});
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Something went wrong');
       return null;

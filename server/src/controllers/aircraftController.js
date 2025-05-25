@@ -9,6 +9,7 @@ export const getAircrafts = async (req, res) => {
   }
 };
 
+// Get a single aircraft by ID
 export const getAircraft = async (req, res) => {
   try {
     const aircraft = await aircraftRepository.getAircraftById(req.params.id);
@@ -23,6 +24,7 @@ export const getAircraft = async (req, res) => {
   }
 };
 
+// Search aircrafts by query parameter
 export const searchAircraftsInFlight = async (req, res) => {
   try {
     const { q } = req.params;
@@ -35,6 +37,7 @@ export const searchAircraftsInFlight = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 export const createNewAircraft = async (req, res) => {
   try {
@@ -54,6 +57,7 @@ export const createNewAircraft = async (req, res) => {
   }
 };
 
+// Get paginated aircrafts with search and sorting used by the admin panel
 export const getAircraftsBySearch = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;

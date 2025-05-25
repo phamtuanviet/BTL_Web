@@ -1,5 +1,6 @@
 import React from 'react'
 
+// Display a banner with a video background and an overlay image
 const Banner = () => {
   return (
     <div

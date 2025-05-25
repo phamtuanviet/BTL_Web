@@ -3,6 +3,8 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 
+// This component displays ticket details and allows users to cancel the ticket
+// It shows flight information, passenger details, and provides a form to enter a cancel code for ticket cancellation.
 const Ticket = ({ data, handleCancel }) => {
   const [isDetail, setIsDetail] = useState(false);
   const [cancelCode, setCancelCode] = useState("");

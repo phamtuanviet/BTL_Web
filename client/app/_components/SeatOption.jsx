@@ -1,6 +1,7 @@
 import { Armchair, Briefcase, Crown } from "lucide-react";
 import React from "react";
 
+// Configuration for seat options
 const seatConfig = {
   ECONOMY: {
     label: "Economy",
@@ -19,6 +20,7 @@ const seatConfig = {
   },
 };
 
+// SeatOption component to display seat options
 export const SeatOption = ({ seat }) => {
   const cfg = seatConfig[seat.seatClass] || {};
   return (

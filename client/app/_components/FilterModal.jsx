@@ -17,6 +17,7 @@ const FilterModal = ({
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [selectedFields, setSelectedFields] = useState([]);
+  // Initialize filter values based on fields
   const [filterValues, setFilterValues] = useState(
     fields.reduce((acc, field) => {
       acc[field.name] = field.defaultValue || "";
@@ -24,6 +25,9 @@ const FilterModal = ({
     }, {})
   );
   const [suggestions, setSuggestions] = useState({});
+  
+  // Abort controllers to handle autocomplete requests
+  // This allows us to cancel previous requests when a new one is made
   const abortControllers = useRef({});
   const {
     searchAirportsByQuery,
@@ -39,6 +43,7 @@ const FilterModal = ({
     );
   };
 
+  // Handle value changes for inputs, including autocomplete fields
   const handleValueChange = (e) => {
     const { name, type, value, files } = e.target;
 

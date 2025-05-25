@@ -13,13 +13,16 @@ const Page = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // Load data from sessionStorage when the component mounts
   useEffect(() => {
     const raw = sessionStorage.getItem("dataPassengers");
     if (raw) setData(JSON.parse(raw));
   }, []);
 
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Check if OTP is exactly 6 digits
     if (!/^\d{6}$/.test(otp)) {
       setError("OTP must be exactly 6 digits");
       return;

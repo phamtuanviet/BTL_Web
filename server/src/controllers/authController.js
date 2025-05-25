@@ -151,6 +151,7 @@ export const sendVerifyOtp = async (req, res) => {
       verifyOtpExpireAt: user.verifyOtpExpireAt,
     });
     //console.log("Passing")
+    // Send OTP to user's email
     const mailOptions = {
       from: process.env.SENDER_EMAIL,
       to: user.email,

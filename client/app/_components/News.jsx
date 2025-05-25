@@ -12,6 +12,7 @@ dayjs.extend(advancedFormat);
 
 const formatDate = (date) => dayjs(date).format("MMMM Do, YYYY");
 
+// Avoid unnecessary re-renders of Slide component
 const Slide = React.memo(({ image, title, createdAt }) => (
   <div className="w-full h-full bg-white rounded-xl p-4 cursor-pointer">
     <div className="w-full h-64 overflow-hidden rounded-t-xl">

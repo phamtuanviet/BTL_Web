@@ -303,7 +303,6 @@ export const lookUpTicket = async (req, res) => {
     const search = req?.params?.search || null;
     let dataSearch = search;
     if (!search || search === "none") {
-      console.log("Hi");
       let userEmail = null;
       const { token } = req.cookies;
       const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);

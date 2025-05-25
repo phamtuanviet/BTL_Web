@@ -1,5 +1,6 @@
 import React from "react";
 
+// Table component to render a table with dynamic columns and rows used by admin pages.
 const Table = ({ columns, renderRow, data }) => {
   console.log(data);
   return (

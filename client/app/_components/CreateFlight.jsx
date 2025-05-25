@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { toLocalDatetimeString } from "@/services/date";
 
+// Effects for framer-motion animations
 const backdropVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
@@ -17,6 +18,7 @@ const modalVariants = {
 
 const SEAT_CLASSES = ["ECONOMY", "BUSINESS", "FIRST_CLASS"];
 
+// CreateFlight component for creating a flight with various fields and suggestions used by admin.
 const CreateFlight = ({
   onClose,
   onSubmit,
@@ -25,6 +27,7 @@ const CreateFlight = ({
   searchAirportsByQuery,
   searchAircraftsByQuery,
 }) => {
+  // Initialize form values based on createFormFields
   const [formValues, setFormValues] = useState(() => {
     const base = createFormFields.reduce((acc, field) => {
       if (field.name === "seats") {
@@ -47,6 +50,7 @@ const CreateFlight = ({
   // hoặc trành trường hợp request về một lúc không theo thứ tự gây sai suggestion
   const abortControllers = useRef({});
 
+  // Auto complete handler for airport and aircraft fields
   const handleAutocomplete = async (fieldName, value, searchFn) => {
     abortControllers.current[fieldName]?.abort();
     const ctrl = new AbortController();
@@ -72,6 +76,7 @@ const CreateFlight = ({
     }
   };
 
+  // Handle input changes for form fields and seats
   const handleChange = (e, seatClass) => {
     const { name, type, value, files } = e.target;
     setFormValues((prev) => {
@@ -111,6 +116,7 @@ const CreateFlight = ({
     });
   };
 
+  // Submit handler for the form
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formValues);

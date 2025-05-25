@@ -1,6 +1,7 @@
 import { BadgeCheck, CalendarDays, ShieldCheck } from "lucide-react";
 import React from "react";
 
+// Apart of body section of the home page, this component displays featured travel options
 const TralveFeatured = () => {
   return (
     <div

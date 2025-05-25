@@ -17,7 +17,7 @@ newsApi.interceptors.response.use(
 const newsService = {
   getAllNews: async () => {
     try {
-      return await newsApi.get("/");
+      return await newsApi.get("/", { withCredentials: true });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -31,6 +31,7 @@ const newsService = {
           skip,
           take,
         },
+        withCredentials: true,
       });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
@@ -48,6 +49,7 @@ const newsService = {
           sortBy,
           sortOrder,
         },
+        withCredentials: true,
       });
       return data;
     } catch (error) {
@@ -58,7 +60,7 @@ const newsService = {
 
   getNewsById: async (id) => {
     try {
-      return await newsApi.get(`/${id}`);
+      return await newsApi.get(`/${id}`, { withCredentials: true });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -67,7 +69,7 @@ const newsService = {
 
   createNews: async (newsData) => {
     try {
-      return await newsApi.post("/", newsData);
+      return await newsApi.post("/", newsData, { withCredentials: true });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -76,7 +78,7 @@ const newsService = {
 
   updateNews: async (id, updateData) => {
     try {
-      return await newsApi.put(`/${id}`, updateData);
+      return await newsApi.put(`/${id}`, updateData, { withCredentials: true });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -89,6 +91,7 @@ const newsService = {
       filterData.pageSize = filterData?.pageSize || 10;
       return await newsApi.get("/filter", {
         params: filterData,
+        withCredentials: true,
       });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
@@ -98,7 +101,7 @@ const newsService = {
 
   deleteNews: async (id) => {
     try {
-      const data = await newsApi.delete(`/${id}`);
+      const data = await newsApi.delete(`/${id}`, { withCredentials: true });
       toast.success("delete success");
       return data;
     } catch (error) {
@@ -109,7 +112,7 @@ const newsService = {
 
   countNews: async () => {
     try {
-      return await newsApi.get("/count-news");
+      return await newsApi.get("/count-news", { withCredentials: true });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;

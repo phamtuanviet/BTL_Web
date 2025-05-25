@@ -17,8 +17,12 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Loading from "./Loading";
+
+// Apart of the body in use client, this component is used to search for flights
 const Search = () => {
+  // type of trip oneway or twoway
   const [tripType, setTripType] = useState("oneway");
+  // state to manage leaving and going airports, start and return dates, active section, airport suggestions, rotation state, passenger count, and loading state
   const [leavingFrom, setLeavingFrom] = useState("");
   const [goingTo, setGoingTo] = useState("");
   const [startDate, setStartDate] = useState(new Date());
@@ -29,6 +33,9 @@ const Search = () => {
   const [passenger, setPassenger] = useState([1, 0, 0]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  // Refs for each section to handle click outside events
+  // These refs are used to detect clicks outside the active section to close it
   const leavingButtonRef = useRef(null);
   const leavingContentRef = useRef(null);
   const goingButtonRef = useRef(null);
@@ -40,6 +47,8 @@ const Search = () => {
   const passengerButtonRef = useRef(null);
   const passengerContentRef = useRef(null);
 
+  // Handlers for minus and plus buttons to adjust passenger counts
+  // These functions update the passenger state based on the index of the passenger type (adult, child, infant)
   const handleMinus = (index) => {
     setPassenger((prev) => {
       const newPassenger = [...prev];
@@ -51,6 +60,8 @@ const Search = () => {
     });
   };
 
+  // Function to handle incrementing the passenger count
+  // This function increases the count of passengers based on the index
   const handlePlus = (index) => {
     setPassenger((prev) => {
       const newPassenger = [...prev];
@@ -61,6 +72,7 @@ const Search = () => {
     });
   };
 
+  // Effect to fetch airport suggestions based on leavingFrom input
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       if (leavingFrom.trim()) {
@@ -78,6 +90,7 @@ const Search = () => {
     return () => clearTimeout(debounceTimer);
   }, [leavingFrom]);
 
+  // Effect to fetch airport suggestions based on goingTo input
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       if (goingTo.trim()) {
@@ -95,6 +108,8 @@ const Search = () => {
     return () => clearTimeout(debounceTimer);
   }, [goingTo]);
 
+  // Effect to handle clicks outside the active section
+  // This effect listens for mousedown events and checks if the click is outside the active section
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!activeSection) return;
@@ -164,6 +179,8 @@ const Search = () => {
     setActiveSection(section === activeSection ? null : section);
   };
 
+  // Function to format the date for display
+  // This function formats the date to a more readable format (e.g., "Jan 1")
   const formatDate = (date) => {
     return date.toLocaleDateString("en-US", {
       month: "short",
@@ -171,6 +188,7 @@ const Search = () => {
     });
   };
 
+  // Function to handle search button click
   const handleSearch = () => {
     if (!leavingFrom || !goingTo) {
       toast.error("Please fill all fields");

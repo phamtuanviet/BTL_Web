@@ -17,6 +17,7 @@ export const getAirportByName = async (name) => {
   });
 };
 
+// Get airports by search query with 20 results limit for client-side search
 export const searchAirportsByQuery = async (q) => {
   return await prisma.airport.findMany({
     where: {

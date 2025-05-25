@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
+// Avoid unnecessary re-renders by memoizing the Slide component
 const Slide = React.memo(({ image, destination, content }) => (
   <div className="w-full h-full bg-white rounded-xl shadow-lg p-4 cursor-pointer">
     <div className="w-full h-64 overflow-hidden rounded-t-xl">
@@ -18,6 +19,7 @@ const Slide = React.memo(({ image, destination, content }) => (
   </div>
 ));
 
+// Apart of the body component that displays famous tourist destinations
 const FamousTourist = () => {
   const containerSlide = useRef(null);
   const [slidesPerView, setSlidesPerView] = useState(3);
@@ -27,6 +29,7 @@ const FamousTourist = () => {
   const timerRef = useRef(null);
 
   useEffect(() => {
+    // Set initial slides per view based on window width
     const container = containerSlide.current;
     if (!container) return;
 
@@ -38,12 +41,14 @@ const FamousTourist = () => {
       setSlidesPerView(newView);
     };
 
+    // Reset slides when the size changes
     const observer = new ResizeObserver(handleResize);
     observer.observe(container);
 
     return () => observer.unobserve(container);
   }, []);
 
+  
   useEffect(() => {
     const newWidth = slidesPerView > 0 ? 100 / slidesPerView : 100;
     setSlideWidth(newWidth);

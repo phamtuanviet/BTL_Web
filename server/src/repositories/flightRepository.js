@@ -59,6 +59,7 @@ export const searchFlightsByName = async (q) => {
   });
 };
 
+// Create a new flight with its seats used by admin
 export const createFlight = async (data) => {
   if (data.departureAirport === data.arrivalAirport) {
     throw new Error("Depature airport and arrival airport must be different");
@@ -101,6 +102,7 @@ export const createFlight = async (data) => {
     },
   });
 
+  // Create flight seats
   const createdSeats = await seats.map(async (seat) => {
     const seatData = {
       ...seat,
@@ -117,6 +119,7 @@ export const createFlight = async (data) => {
   return createdFlight;
 };
 
+// Update flight information and its seats used by admin
 export const updatedFlight = async (id, data) => {
   const { estimatedDeparture, estimatedArrival, seats } = data;
   const estimatedDepartureTime = estimatedDeparture
@@ -185,6 +188,7 @@ export const updatedFlight = async (id, data) => {
   });
 };
 
+// Get all flights with pagination and search functionality used by admin
 export const getFlightsBySearch = async (
   page = 1,
   pageSize = 10,
@@ -300,6 +304,7 @@ export const getFlightsBySearch = async (
       price: s.price,
     }));
 
+    // Calculate total seats and booked seats of all classes
     const totalSeats = seatsByClass.reduce((sum, s) => sum + s.totalSeats, 0);
     const bookedSeats = seatsByClass.reduce((sum, s) => sum + s.bookedSeats, 0);
 
@@ -343,6 +348,7 @@ export const cancelFlight = async (id) => {
   });
 };
 
+// Filter flights based on various criteria used by admin
 export const filterFlights = async (query) => {
   const {
     id,
@@ -422,6 +428,7 @@ export const filterFlights = async (query) => {
       price: s.price,
     }));
 
+    // Calculate total seats and booked seats of all classes
     const totalSeats = seatsByClass.reduce((sum, s) => sum + s.totalSeats, 0);
     const bookedSeats = seatsByClass.reduce((sum, s) => sum + s.bookedSeats, 0);
 
@@ -444,6 +451,7 @@ export const filterFlights = async (query) => {
   };
 };
 
+// Search flights for user in a specific trip
 export const searchFlightsForUser = async (params) => {
   const {
     tripType,

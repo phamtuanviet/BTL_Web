@@ -21,6 +21,9 @@ const Menu = () => {
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch();
+  
+  // Handle logout confirmation and action
+  // This function will be called when the user clicks the logout link
   const handleLogout = () => {
     Swal.fire({
       title: "Are you sure you want to logout?",

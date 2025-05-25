@@ -40,7 +40,9 @@ const airportService = {
 
   searchAirports: async (searchTerm) => {
     try {
-      return await airportApi.get(`/search-airports/${searchTerm}`);
+      return await airportApi.get(`/search-airports/${searchTerm}`, {
+        withCredentials: true,
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -51,6 +53,7 @@ const airportService = {
     try {
       return await airportApi.get(`/search-airports-in-flight/${searchTerm}`, {
         signal,
+        withCredentials: true,
       });
     } catch (error) {
       if (error.message === "canceled") return;
@@ -61,7 +64,9 @@ const airportService = {
 
   createNewAirport: async (airportData) => {
     try {
-      return await airportApi.post("/create", airportData);
+      return await airportApi.post("/create", airportData, {
+        withCredentials: true,
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -70,7 +75,9 @@ const airportService = {
 
   updateAirport: async (id, updateData) => {
     try {
-      return await airportApi.put(`/update/${id}`, updateData);
+      return await airportApi.put(`/update/${id}`, updateData, {
+        withCredentials: true,
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;
@@ -79,7 +86,10 @@ const airportService = {
 
   deleteAirport: async (id) => {
     try {
-      return await airportApi.delete(`/delete/${id}`);
+      return await airportApi.delete(
+        `/delete/${id}`,
+        { withCredentials: true }
+      );
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
       return null;

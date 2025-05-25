@@ -10,6 +10,7 @@ const page = () => {
   const [data, setData] = useState(null);
   console.log(data);
 
+  // Load data from sessionStorage when the component mounts
   useEffect(() => {
     const raw = sessionStorage.getItem("dataBookingFlightConfirm");
     if (raw) setData(JSON.parse(raw));

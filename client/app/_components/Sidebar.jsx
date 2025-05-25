@@ -49,7 +49,7 @@ const Sidebar = ({ type }) => {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={`${
               type === "big" ? "hidden md:block" : "block"
-            } h-full z-10 fixed`}
+            } h-full z-10 fixed w-64`}
           >
             <div className="py-5 bg-gray-100 w-[17rem] rounded-r-3xl shadow-md pr-4 h-full">
               <div className="flex justify-between items-center">

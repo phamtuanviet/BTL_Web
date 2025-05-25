@@ -33,6 +33,8 @@ const formSchema = z.object({
     .email("Email không hợp lệ")
     .nonempty("Email không được để trống"),
 });
+
+// Schema for new password
 const passwordSchema = z
   .object({
     password: z.string().min(6, "Password must have at least 6 characters"),

@@ -3,6 +3,8 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// This cron job updates flight statuses every minute
+// It checks for flights that are scheduled or delayed and updates their status to departed if the departure time has passed
 export const startFlightStatusCron = () => {
   cron.schedule("* * * * *", async () => {
     const now = new Date();

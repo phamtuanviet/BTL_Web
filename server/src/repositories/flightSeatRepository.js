@@ -6,12 +6,14 @@ export const getAllFlightSeats = async () => {
   return await prisma.flightSeat.findMany();
 };
 
+
 export const getFlightSeatById = async (id) => {
   return await prisma.flightSeat.findUnique({
     where: { id: Number(id) },
   });
 };
 
+// Get flight seat by flightId and seatClass
 export const getFlightSeatBySeatClassAndFlight = async (
   flightId,
   seatClass

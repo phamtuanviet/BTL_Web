@@ -1,6 +1,9 @@
 import React from "react";
 
+
+// This component is used to render pagination controls for navigating through pages of data used by admin pages.
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  // Function to generate an array of page numbers for pagination
   const generatePageNumbers = () => {
     let start = currentPage - 4;
     let end = currentPage + 5;
