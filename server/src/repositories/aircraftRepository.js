@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../services/prisma.js";
 
 // Function to sanitize aircraft data to convert BigInt to string and 
 // avoid JSON serialization issues

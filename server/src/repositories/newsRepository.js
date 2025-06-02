@@ -1,10 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../services/prisma.js";
 import cloudinary from "../services/cloudinary.js";
 import { Readable } from "stream";
 import dotenv from "dotenv";
 dotenv.config();
 
-const prisma = new PrismaClient();
+
 
 // Function to sanitize news data to convert BigInt to string and format Date
 const sanitizeNews = (news) => {

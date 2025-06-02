@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
-
+import { prisma } from "../services/prisma.js";
 export const getAllPassengers = async () => {
   return await prisma.passenger.findMany();
 };

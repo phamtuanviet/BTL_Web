@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../services/prisma.js";
 
 import { startOfDay, subDays, addDays } from "date-fns";
 

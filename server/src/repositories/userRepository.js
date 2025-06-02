@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../services/prisma.js";
 
 const sanitizeUser = (user) => {
   const converted = { ...user };

@@ -1,4 +1,4 @@
-import { PassengerType, PrismaClient } from "@prisma/client";
+import { PassengerType } from "@prisma/client";
 import { findUserByEmail, findUserById } from "./userRepository.js";
 import {
   getFlightSeatById,
@@ -9,7 +9,7 @@ import {
 import { getFlightByFlightNumber } from "./flightRepository.js";
 import { generateBookingReference } from "../services/other.js";
 import { startOfDay, subDays, addDays } from "date-fns";
-const prisma = new PrismaClient();
+import { prisma } from "../services/prisma.js";
 
 const sanitize = (obj) => {
   const converted = { ...obj };

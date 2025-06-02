@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../services/prisma.js";
 import { getAirportById, getAirportByName } from "./airportRepository.js";
 import { getAircraftById, getAircraftByName } from "./aircraftRepository.js";
 import {
@@ -7,7 +7,7 @@ import {
   updateFlightSeat,
 } from "./flightSeatRepository.js";
 import { generateFlightNumber } from "../services/other.js";
-const prisma = new PrismaClient();
+
 
 const sanitize = (obj) => {
   const converted = { ...obj };

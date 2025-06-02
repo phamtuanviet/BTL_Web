@@ -1,5 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { prisma } from "../services/prisma.js";
 
 // Create a new OTP for email verification to buying a ticket
 export async function createOtp(email, otp, ttlSeconds = 1000) {
