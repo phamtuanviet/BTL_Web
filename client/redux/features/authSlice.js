@@ -161,6 +161,7 @@ const initialState = {
   isLoading: false,
   error: null,
   message: null,
+  isRegistered: false,
 };
 
 const authSlice = createSlice({
@@ -173,6 +174,9 @@ const authSlice = createSlice({
     },
     clearMessage(state) {
       state.message = null;
+    },
+    setIsRegisteredFalse(state) {
+      state.isRegistered = false;
     },
   },
   extraReducers: (builder) => {
@@ -187,6 +191,7 @@ const authSlice = createSlice({
         if (action.payload.user) {
           state.user = action.payload.user;
         }
+        state.isRegistered = true;
         state.message = action.payload.message;
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -298,5 +303,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, clearMessage } = authSlice.actions;
+export const { setUser, clearMessage ,setIsRegisteredFalse  } = authSlice.actions;
 export default authSlice.reducer;

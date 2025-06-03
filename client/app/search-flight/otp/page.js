@@ -34,9 +34,11 @@ const Page = () => {
       otp,
     };
     setIsLoading(true);
+
     const res = await ticketService.createTicketClient(bodyRequest);
+    console.log(res)
     setIsLoading(false);
-    if (res.success) {
+    if (res?.success) {
       setCheck(true);
       router.push("/");
       toast.success("Register ticket successfully,please check your email to recive info ticket");

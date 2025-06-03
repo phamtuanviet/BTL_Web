@@ -42,7 +42,7 @@ export default function Page() {
 
   const fetchFlights = async () => {
     const res = await flightService.searchFlightsByUser(dataSearch);
-    const { outbound = [], inbound = [] } = res.data;
+    const { outbound = [], inbound = [] } = res?.data || {};
     setOutboundFlights(outbound);
     setInboundFlights(inbound);
     setStep("outbound");

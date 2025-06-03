@@ -22,6 +22,7 @@ import {
   registerUser,
   sendVerifyOtp,
 } from "@/redux/features/authSlice";
+import { setIsRegisteredFalse } from "@/redux/features/authSlice";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -32,7 +33,11 @@ export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(
     searchParams.get("isLogin") === "true"
   );
-  const { user, isLoading, error, isAuthenticated, message } = useSelector(
+  useEffect(() => {
+    dispatch(setIsRegisteredFalse());
+  }, [dispatch]);
+
+  const { user, isLoading, error, isAuthenticated, message ,isRegistered} = useSelector(
     (state) => state.auth
   );
 
@@ -69,7 +74,7 @@ export default function AuthForm() {
     if (isAuthenticated && isLogin) {
       toast.success(message);
       router.push("/");
-    } else if (user && isAuthenticated === false) {
+    } else if (user && isAuthenticated === false && isRegistered) {
       dispatch(sendVerifyOtp({id :user.id}));
       toast.success(message);
       router.push("/auth/verify?type=verify-email");

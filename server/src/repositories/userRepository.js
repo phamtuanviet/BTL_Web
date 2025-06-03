@@ -82,9 +82,13 @@ export const findUserById = async (id) => {
 };
 
 export const updateUser = async (id, newData) => {
+  const realData = {
+    ...newData,
+    isAccountVerified: newData.isAccountVerified === "true",
+  };
   const user = await prisma.user.update({
     where: { id },
-    data: newData,
+    data: realData,
   });
 
   const sanitizedUser = sanitizeUser(user);

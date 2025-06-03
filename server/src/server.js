@@ -18,7 +18,7 @@ import { revenueRoute } from "./routes/revenueRoute.js";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 5002;
 startFlightStatusCron();
 
 // Parse JSON bodies
